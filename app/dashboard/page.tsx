@@ -135,7 +135,7 @@ export default function DashboardPage() {
               )}
               <Link href={`/profile/${profile?.id}`}
                 className="block text-center text-xs font-semibold text-primary-600 border border-primary-200 rounded-xl py-2 hover:bg-primary-50 transition-colors">
-                {t.dashboard.alumniDir === 'Mezun Rehberi' ? 'Profilimi Görüntüle' : 'View My Profile'}
+                {t.profile.viewProfile}
               </Link>
             </div>
 
