@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary:     #E30A17;   /* Turkish flag red */
+  --primary-dark:#C0061A;
+  --navy:        #1E2D5A;   /* UVA navy */
+  --orange:      #E57200;   /* UVA orange */
+  --cream:       #F7F3EE;
+  --sand:        #E8E0D5;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-dm-sans:  'DM Sans', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-dm-sans);
+  background-color: #ffffff;
+  color: #1a1a2e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-playfair);
+}
+
+/* Turkish star pattern (white on red for hero sections) */
+.turkish-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 0 L46 28 L80 40 L46 52 L40 80 L34 52 L0 40 L34 28 Z' fill='rgba(255%2C255%2C255%2C0.07)'/%3E%3Ccircle cx='40' cy='40' r='14' fill='none' stroke='rgba(255%2C255%2C255%2C0.05)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* Ornament divider */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--primary);
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--sand), transparent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Card hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(227, 10, 23, 0.08);
+}
+
+/* Red underline link */
+.link-red {
+  position: relative;
+  color: var(--primary);
+  text-decoration: none;
+}
+.link-red::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0;
+  width: 0; height: 1px;
+  background: var(--primary);
+  transition: width 0.25s ease;
+}
+.link-red:hover::after { width: 100%; }
+
+/* Form labels */
+label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+/* Animation delays */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+
+/* ─── Primary color utilities (Turkish red #E30A17) ───────────────────────── */
+/* These supplement Tailwind's compiled output so the primary scale works      */
+/* regardless of whether the dev server has recompiled tailwind.config.ts.     */
+
+.bg-primary-50  { background-color: #fff1f1; }
+.bg-primary-100 { background-color: #ffe0e0; }
+.bg-primary-200 { background-color: #ffc6c6; }
+.bg-primary-300 { background-color: #ff9e9e; }
+.bg-primary-400 { background-color: #ff6565; }
+.bg-primary-500 { background-color: #f83535; }
+.bg-primary-600 { background-color: #e30a17; }
+.bg-primary-700 { background-color: #c00614; }
+.bg-primary-800 { background-color: #9f0715; }
+.bg-primary-900 { background-color: #850b17; }
+
+.text-primary-50  { color: #fff1f1; }
+.text-primary-100 { color: #ffe0e0; }
+.text-primary-200 { color: #ffc6c6; }
+.text-primary-300 { color: #ff9e9e; }
+.text-primary-400 { color: #ff6565; }
+.text-primary-500 { color: #f83535; }
+.text-primary-600 { color: #e30a17; }
+.text-primary-700 { color: #c00614; }
+.text-primary-800 { color: #9f0715; }
+.text-primary-900 { color: #850b17; }
+
+.border-primary-50  { border-color: #fff1f1; }
+.border-primary-100 { border-color: #ffe0e0; }
+.border-primary-200 { border-color: #ffc6c6; }
+.border-primary-300 { border-color: #ff9e9e; }
+.border-primary-400 { border-color: #ff6565; }
+.border-primary-500 { border-color: #f83535; }
+.border-primary-600 { border-color: #e30a17; }
+.border-primary-700 { border-color: #c00614; }
+
+.ring-primary-500\/30 { --tw-ring-color: rgba(248, 53, 53, 0.30); }
+
+.hover\:bg-primary-50:hover  { background-color: #fff1f1; }
+.hover\:bg-primary-100:hover { background-color: #ffe0e0; }
+.hover\:bg-primary-600:hover { background-color: #e30a17; }
+.hover\:bg-primary-700:hover { background-color: #c00614; }
+.hover\:text-primary-600:hover { color: #e30a17; }
+.hover\:text-primary-700:hover { color: #c00614; }
+
+.focus\:border-primary-500:focus { border-color: #f83535; }
+.focus\:ring-2:focus { --tw-ring-shadow: 0 0 0 2px var(--tw-ring-color); box-shadow: var(--tw-ring-shadow); }
+
+/* Opacity variants used in hero gradients */
+.from-primary-700\/60 { --tw-gradient-from: rgba(192, 6, 20, 0.60); --tw-gradient-to: transparent; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.from-primary-700\/70 { --tw-gradient-from: rgba(192, 6, 20, 0.70); --tw-gradient-to: transparent; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.to-primary-800\/40   { --tw-gradient-to: rgba(159, 7, 21, 0.40); }
+.to-primary-600\/20   { --tw-gradient-to: rgba(227, 10, 23, 0.20); }
+
+.from-primary-600\/30 { --tw-gradient-from: rgba(227, 10, 23, 0.30); }
+.to-primary-600\/10   { --tw-gradient-to: rgba(227, 10, 23, 0.10); }
+
+/* Primary border with opacity */
+.border-primary-200 { border-color: #ffc6c6; }
+
+/* group-hover variants */
+.group:hover .group-hover\:bg-primary-50  { background-color: #fff1f1; }
+.group:hover .group-hover\:text-primary-600 { color: #e30a17; }
