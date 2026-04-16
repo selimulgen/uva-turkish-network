@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
@@ -9,15 +9,58 @@ import { useLanguage } from '@/lib/language-context';
 import type { Profile } from '@/lib/types';
 import { INDUSTRIES, LOOKING_FOR_OPTIONS, generateYearRange } from '@/lib/utils';
 import { Save, CheckCircle2 } from 'lucide-react';
+import AcademicSelector, {
+  type AcademicInfo,
+  EMPTY_ACADEMIC_INFO,
+} from '@/components/profile/AcademicSelector';
+import type { EducationLevel } from '@/lib/uva-data';
 
-const DEGREE_TYPES = ['B.A.', 'B.S.', 'M.S.', 'M.A.', 'MBA', 'J.D.', 'M.D.', 'Ph.D.', 'Other'];
 const YEARS = generateYearRange(1970, new Date().getFullYear() + 5);
 
+// Build AcademicInfo from a saved profile row
+function profileToAcademic(profile: Partial<Profile>): AcademicInfo {
+  if (!profile.uva_level) return EMPTY_ACADEMIC_INFO;
+
+  const programs = (profile.uva_programs as AcademicInfo['additionalPrograms']) ?? [];
+  const [primary, ...rest] = programs;
+
+  return {
+    level:               (profile.uva_level as EducationLevel) ?? '',
+    primarySchool:       profile.uva_school ?? primary?.school ?? '',
+    primaryProgram:      primary?.program ?? '',
+    primaryCustomProgram: primary?.customProgram ?? '',
+    additionalPrograms:  rest,
+  };
+}
+
+// Flatten AcademicInfo back into profile columns for saving
+function academicToProfile(info: AcademicInfo): Pick<Profile, 'uva_level' | 'uva_school' | 'uva_programs'> {
+  if (!info.level) {
+    return { uva_level: null, uva_school: null, uva_programs: null };
+  }
+
+  const primaryEntry = {
+    type:          'major' as const,
+    school:        info.primarySchool,
+    program:       info.primaryProgram,
+    customProgram: info.primaryCustomProgram,
+  };
+
+  return {
+    uva_level:    info.level,
+    uva_school:   info.primarySchool,
+    uva_programs: info.primaryProgram
+      ? [primaryEntry, ...info.additionalPrograms]
+      : [],
+  };
+}
+
 export default function EditProfilePage() {
-  const [profile, setProfile] = useState<Partial<Profile>>({});
-  const [saving, setSaving]   = useState(false);
-  const [saved, setSaved]     = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile]           = useState<Partial<Profile>>({});
+  const [academicInfo, setAcademicInfo] = useState<AcademicInfo>(EMPTY_ACADEMIC_INFO);
+  const [saving, setSaving]             = useState(false);
+  const [saved, setSaved]               = useState(false);
+  const [loading, setLoading]           = useState(true);
 
   const router   = useRouter();
   const supabase = createClient();
@@ -34,7 +77,10 @@ export default function EditProfilePage() {
         .eq('id', user.id)
         .single();
 
-      if (data) setProfile(data as Profile);
+      if (data) {
+        setProfile(data as Profile);
+        setAcademicInfo(profileToAcademic(data as Profile));
+      }
     } finally {
       setLoading(false);
     }
@@ -61,9 +107,16 @@ export default function EditProfilePage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    const academicCols = academicToProfile(academicInfo);
+
     const { error } = await supabase
       .from('profiles')
-      .update({ ...profile, profile_completed: true, updated_at: new Date().toISOString() })
+      .update({
+        ...profile,
+        ...academicCols,
+        profile_completed: true,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', user.id);
 
     setSaving(false);
@@ -85,8 +138,8 @@ export default function EditProfilePage() {
   const isAlumni  = profile.role === 'alumni';
   const isStudent = profile.role === 'student';
 
-  const inputClass  = "w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors text-sm";
-  const selectClass = inputClass + " cursor-pointer";
+  const inputClass  = 'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors text-sm';
+  const selectClass = inputClass + ' cursor-pointer';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,7 +156,7 @@ export default function EditProfilePage() {
 
         <form onSubmit={handleSave} className="space-y-6">
 
-          {/* Basic Info */}
+          {/* ── Basic Info ─────────────────────────────────────────────────── */}
           <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
             <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.basicInfo}</h2>
             <div className="space-y-4">
@@ -121,12 +174,22 @@ export default function EditProfilePage() {
             </div>
           </section>
 
-          {/* Student fields */}
+          {/* ── UVA Academic Background (both roles) ───────────────────────── */}
+          <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h2 className="text-base font-bold text-gray-900 mb-1">UVA Academic Background</h2>
+            <p className="text-gray-400 text-xs mb-5">
+              Select your degree level, school, and program(s) at UVA.
+              Use "Add another major or minor" to list up to 4 total.
+            </p>
+            <AcademicSelector value={academicInfo} onChange={setAcademicInfo} />
+          </section>
+
+          {/* ── Student-specific fields ────────────────────────────────────── */}
           {isStudent && (
             <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.academic}</h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.gradYear}</label>
                   <select value={profile.graduation_year || ''} onChange={e => update('graduation_year', parseInt(e.target.value))}
                     className={selectClass}>
@@ -135,19 +198,6 @@ export default function EditProfilePage() {
                       <option key={y} value={y}>{y}</option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.degreeType}</label>
-                  <select value={profile.degree_type || ''} onChange={e => update('degree_type', e.target.value)}
-                    className={selectClass}>
-                    <option value="">{t.profile.selectType}</option>
-                    {DEGREE_TYPES.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.major}</label>
-                  <input type="text" value={profile.major || ''} onChange={e => update('major', e.target.value)}
-                    className={inputClass} placeholder="e.g. Computer Science" />
                 </div>
               </div>
 
@@ -172,25 +222,18 @@ export default function EditProfilePage() {
             </section>
           )}
 
-          {/* Alumni fields */}
+          {/* ── Alumni-specific fields ─────────────────────────────────────── */}
           {isAlumni && (
             <>
               <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                 <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.uvaBackground}</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.uvaGradYear}</label>
-                    <select value={profile.uva_graduation_year || ''} onChange={e => update('uva_graduation_year', parseInt(e.target.value))}
-                      className={selectClass}>
-                      <option value="">{t.profile.selectYear}</option>
-                      {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.uvaStudied}</label>
-                    <input type="text" value={profile.uva_major || ''} onChange={e => update('uva_major', e.target.value)}
-                      className={inputClass} placeholder="e.g. Economics" />
-                  </div>
+                <div>
+                  <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.uvaGradYear}</label>
+                  <select value={profile.uva_graduation_year || ''} onChange={e => update('uva_graduation_year', parseInt(e.target.value))}
+                    className={selectClass}>
+                    <option value="">{t.profile.selectYear}</option>
+                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
                 </div>
               </section>
 
@@ -233,9 +276,9 @@ export default function EditProfilePage() {
                 <p className="text-gray-500 text-sm mb-5">{t.profile.privacySub}</p>
                 <div className="space-y-5">
                   {[
-                    { field: 'show_contact_info', label: t.profile.showContact,  desc: t.profile.showContactDesc },
-                    { field: 'open_to_coffee_chat', label: t.profile.openCoffee, desc: t.profile.openCoffeeDesc },
-                    { field: 'open_to_mentorship', label: t.profile.openMentor,  desc: t.profile.openMentorDesc },
+                    { field: 'show_contact_info',   label: t.profile.showContact,  desc: t.profile.showContactDesc },
+                    { field: 'open_to_coffee_chat', label: t.profile.openCoffee,   desc: t.profile.openCoffeeDesc },
+                    { field: 'open_to_mentorship',  label: t.profile.openMentor,   desc: t.profile.openMentorDesc },
                   ].map(item => (
                     <label key={item.field} className="flex items-center justify-between gap-4 cursor-pointer">
                       <div>
@@ -259,6 +302,7 @@ export default function EditProfilePage() {
             </>
           )}
 
+          {/* ── Save / Cancel ──────────────────────────────────────────────── */}
           <div className="flex items-center justify-between pt-2">
             <button
               type="button"

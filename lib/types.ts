@@ -29,6 +29,16 @@ export interface Profile {
   open_to_coffee_chat: boolean;
   open_to_mentorship: boolean;
 
+  // UVA academic background (structured — replaces plain-text major/degree_type)
+  uva_level?: string | null;       // 'undergraduate' | 'graduate' | 'phd'
+  uva_school?: string | null;      // primary school
+  uva_programs?: Array<{           // all programs (index 0 = primary major)
+    type: 'major' | 'minor';
+    school: string;
+    program: string;
+    customProgram?: string;
+  }> | null;
+
   profile_completed: boolean;
   created_at: string;
   updated_at: string;
