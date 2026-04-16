@@ -25,6 +25,7 @@ export interface Profile {
   industry?: string | null;
   city?: string | null;
   linkedin_url?: string | null;
+  phone_number?: string | null;
   show_contact_info: boolean;
   open_to_coffee_chat: boolean;
   open_to_mentorship: boolean;

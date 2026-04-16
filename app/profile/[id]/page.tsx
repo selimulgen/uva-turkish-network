@@ -11,7 +11,7 @@ import type { Profile } from '@/lib/types';
 import { LOOKING_FOR_OPTIONS, getInitials, formatRelativeDate } from '@/lib/utils';
 import {
   MapPin, Building2, GraduationCap, Linkedin, Mail, Coffee,
-  BookOpen, ArrowLeft, CheckCircle, Clock, X
+  BookOpen, ArrowLeft, CheckCircle, Clock, X, Phone
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -116,9 +116,18 @@ export default function ProfilePage() {
           <div className="px-6 pb-6">
             {/* Avatar */}
             <div className="relative -mt-12 mb-4">
-              <div className="w-20 h-20 rounded-2xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-md">
-                {getInitials(profile.full_name || profile.email)}
-              </div>
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.full_name || 'Profile'}
+                  className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-md">
+                  {getInitials(profile.full_name || profile.email)}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -172,7 +181,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 min-w-[160px]">
                 {isOwn && (
                   <Link href="/profile/edit"
                     className="text-sm font-medium text-gray-700 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50 transition-colors text-center">
@@ -190,8 +199,14 @@ export default function ProfilePage() {
                     )}
                     <a href={`mailto:${profile.email}`}
                       className="flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50 transition-colors">
-                      <Mail size={14} /> Email
+                      <Mail size={14} /> {profile.email}
                     </a>
+                    {profile.phone_number && (
+                      <a href={`tel:${profile.phone_number}`}
+                        className="flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50 transition-colors">
+                        <Phone size={14} /> {profile.phone_number}
+                      </a>
+                    )}
                   </div>
                 )}
 

@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile } from '@/lib/types';
-import { INDUSTRIES, LOOKING_FOR_OPTIONS, generateYearRange } from '@/lib/utils';
-import { Save, CheckCircle2 } from 'lucide-react';
+import { INDUSTRIES, LOOKING_FOR_OPTIONS, generateYearRange, getInitials } from '@/lib/utils';
+import { Save, CheckCircle2, Camera } from 'lucide-react';
 import AcademicSelector, {
   type AcademicInfo,
   EMPTY_ACADEMIC_INFO,
@@ -56,11 +56,13 @@ function academicToProfile(info: AcademicInfo): Pick<Profile, 'uva_level' | 'uva
 }
 
 export default function EditProfilePage() {
-  const [profile, setProfile]           = useState<Partial<Profile>>({});
-  const [academicInfo, setAcademicInfo] = useState<AcademicInfo>(EMPTY_ACADEMIC_INFO);
-  const [saving, setSaving]             = useState(false);
-  const [saved, setSaved]               = useState(false);
-  const [loading, setLoading]           = useState(true);
+  const [profile, setProfile]                 = useState<Partial<Profile>>({});
+  const [academicInfo, setAcademicInfo]       = useState<AcademicInfo>(EMPTY_ACADEMIC_INFO);
+  const [saving, setSaving]                   = useState(false);
+  const [saved, setSaved]                     = useState(false);
+  const [loading, setLoading]                 = useState(true);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef                          = useRef<HTMLInputElement>(null);
 
   const router   = useRouter();
   const supabase = createClient();
@@ -98,6 +100,39 @@ export default function EditProfilePage() {
       ? current.filter(v => v !== value)
       : [...current, value]
     );
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File is too large. Please choose an image under 5 MB.');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const ext  = file.name.split('.').pop() ?? 'jpg';
+      const path = `${user.id}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (!uploadError) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(path);
+        update('avatar_url', `${publicUrl}?t=${Date.now()}`);
+      }
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -156,6 +191,53 @@ export default function EditProfilePage() {
 
         <form onSubmit={handleSave} className="space-y-6">
 
+          {/* ── Profile Picture ────────────────────────────────────────────── */}
+          <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.profilePicture}</h2>
+            <div className="flex items-center gap-5">
+              <div className="relative flex-shrink-0">
+                {profile.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profile.avatar_url}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-100"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold border-2 border-gray-100">
+                    {getInitials(profile.full_name || profile.email || '')}
+                  </div>
+                )}
+                {avatarUploading && (
+                  <div className="absolute inset-0 rounded-2xl bg-black/50 flex items-center justify-center">
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label
+                  className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    avatarUploading
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  <Camera size={14} />
+                  {avatarUploading ? t.profile.uploadingPicture : t.profile.changePicture}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleAvatarUpload}
+                    disabled={avatarUploading}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-xs text-gray-400 mt-2">{t.profile.pictureHint}</p>
+              </div>
+            </div>
+          </section>
+
           {/* ── Basic Info ─────────────────────────────────────────────────── */}
           <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
             <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.basicInfo}</h2>
@@ -179,7 +261,7 @@ export default function EditProfilePage() {
             <h2 className="text-base font-bold text-gray-900 mb-1">UVA Academic Background</h2>
             <p className="text-gray-400 text-xs mb-5">
               Select your degree level, school, and program(s) at UVA.
-              Use "Add another major or minor" to list up to 4 total.
+              Use &quot;Add another major or minor&quot; to list up to 4 total.
             </p>
             <AcademicSelector value={academicInfo} onChange={setAcademicInfo} />
           </section>
@@ -263,10 +345,20 @@ export default function EditProfilePage() {
                     <input type="text" value={profile.city || ''} onChange={e => update('city', e.target.value)}
                       className={inputClass} placeholder="e.g. New York, NY" />
                   </div>
-                  <div className="sm:col-span-2">
+                  <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.linkedin}</label>
                     <input type="url" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)}
                       className={inputClass} placeholder="https://linkedin.com/in/yourname" />
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.phone}</label>
+                    <input
+                      type="tel"
+                      value={profile.phone_number || ''}
+                      onChange={e => update('phone_number', e.target.value)}
+                      className={inputClass}
+                      placeholder={t.profile.phonePlaceholder}
+                    />
                   </div>
                 </div>
               </section>

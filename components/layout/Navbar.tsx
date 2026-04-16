@@ -59,6 +59,7 @@ export default function Navbar() {
     ? [
         { href: '/dashboard',  label: t.nav.dashboard },
         { href: '/directory',  label: t.nav.directory },
+        { href: '/students',   label: t.nav.students },
         { href: '/jobs',       label: t.nav.opportunities },
         { href: '/requests',   label: t.nav.requests },
         ...(user.role === 'alumni' ? [{ href: '/messages', label: t.nav.messages }] : []),
@@ -146,8 +147,13 @@ export default function Navbar() {
                   onClick={() => setDropOpen(!dropOpen)}
                   className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-xs font-bold text-white">
-                    {getInitials(user.full_name || user.email)}
+                  <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 bg-primary-600 flex items-center justify-center text-xs font-bold text-white">
+                    {user.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(user.full_name || user.email)
+                    )}
                   </div>
                   <span className="text-gray-700 text-sm max-w-[90px] truncate">
                     {user.full_name?.split(' ')[0] || 'Me'}
