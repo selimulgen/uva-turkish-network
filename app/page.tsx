@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/lib/language-context';
@@ -33,14 +34,36 @@ export default function LandingPage() {
       <section className="relative min-h-screen bg-primary-600 turkish-pattern flex items-center overflow-hidden">
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-700/60 via-transparent to-primary-800/40 pointer-events-none" />
-        {/* White glow */}
-        <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full bg-white/5 blur-3xl pointer-events-none" />
+
+        {/* TSA Logo — large faded watermark (right side, behind content) */}
+        <div className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-[580px] h-[580px] pointer-events-none select-none hidden lg:block">
+          {/* Radial fade mask so logo dissolves into background */}
+          <div className="absolute inset-0 rounded-full"
+            style={{ background: 'radial-gradient(circle, transparent 30%, rgba(196,10,23,0.4) 60%, #C0081A 80%)' }}
+          />
+          <Image
+            src="/tsa_logo.jpg"
+            alt=""
+            fill
+            className="object-contain opacity-[0.18] mix-blend-luminosity"
+            priority
+          />
+        </div>
+
+        {/* White glow accent */}
+        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-white/5 blur-3xl pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
           <div className="max-w-3xl">
-            {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8">
-              <span className="text-lg">🇹🇷</span>
+            {/* Eyebrow with the actual logo */}
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
+              <Image
+                src="/tsa_logo.jpg"
+                alt="TSA at UVA"
+                width={28}
+                height={28}
+                className="rounded-full opacity-90"
+              />
               <span className="text-white/90 text-sm font-medium">{t.landing.eyebrow}</span>
             </div>
 
@@ -88,9 +111,7 @@ export default function LandingPage() {
 
         {/* UVA badge — bottom right */}
         <div className="absolute bottom-8 right-8 flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
-          <div className="w-4 h-4 bg-uva-orange rounded-sm flex items-center justify-center">
-            <span className="text-white text-[9px] font-bold">U</span>
-          </div>
+          <Image src="/tsa_logo.jpg" alt="" width={16} height={16} className="opacity-80" />
           <span className="text-white/60 text-xs">University of Virginia</span>
         </div>
       </section>

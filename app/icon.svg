@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background circle: UVA orange/red -->
+  <circle cx="16" cy="16" r="16" fill="#E30A17"/>
+
+  <!-- Outer ring -->
+  <circle cx="16" cy="16" r="15" fill="none" stroke="white" stroke-width="1.2"/>
+
+  <!-- Inner circle background (darker red for contrast) -->
+  <circle cx="16" cy="16" r="11.5" fill="#C0081A"/>
+
+  <!-- Turkish crescent (white) -->
+  <!-- Outer circle of crescent -->
+  <circle cx="13.5" cy="16" r="5.5" fill="white"/>
+  <!-- Inner masking circle (red, offset right) -->
+  <circle cx="16" cy="16" r="4.5" fill="#C0081A"/>
+
+  <!-- 5-pointed star (white, right of crescent) -->
+  <polygon
+    points="20,12.8 20.6,14.5 22.3,14.5 21,15.5 21.5,17.2 20,16.2 18.5,17.2 19,15.5 17.7,14.5 19.4,14.5"
+    fill="white"/>
+</svg>

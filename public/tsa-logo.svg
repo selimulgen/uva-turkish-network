@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <!-- Star shape (outer r=9, inner r=3.6), centered at origin -->
+    <polygon id="star5"
+      points="0,-9 2.11,-2.9 8.56,-2.78 3.44,1.1 5.24,7.78 0,3.6 -5.24,7.78 -3.44,1.1 -8.56,-2.78 -2.11,-2.9"
+      fill="none" stroke="black" stroke-width="1.3" stroke-linejoin="round"/>
+
+    <!-- Top arc path for TURKISH STUDENT ASSOCIATION (CW through top) -->
+    <path id="topArc" d="M 25,250 A 225,225 0 0,1 475,250"/>
+
+    <!-- Radial gradient mask to clip the circle nicely -->
+    <clipPath id="circleClip">
+      <circle cx="250" cy="250" r="245"/>
+    </clipPath>
+  </defs>
+
+  <!-- White background -->
+  <circle cx="250" cy="250" r="248" fill="white"/>
+
+  <!-- Outer thick border ring -->
+  <circle cx="250" cy="250" r="244" fill="none" stroke="black" stroke-width="8"/>
+
+  <!-- Inner thin border ring -->
+  <circle cx="250" cy="250" r="207" fill="none" stroke="black" stroke-width="2"/>
+
+  <!-- ── RING TEXT: TURKISH STUDENT ASSOCIATION ─────────────────────────── -->
+  <text font-family="'Times New Roman', Times, Georgia, serif"
+        font-size="24" font-weight="bold" letter-spacing="4.5" fill="black">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+      TURKISH STUDENT ASSOCIATION
+    </textPath>
+  </text>
+
+  <!-- ── RING STARS ──────────────────────────────────────────────────────── -->
+  <!-- Left star (9 o'clock, inside ring) -->
+  <use href="#star5" transform="translate(35,252)"/>
+  <!-- Right star (3 o'clock, inside ring) -->
+  <use href="#star5" transform="translate(465,252)"/>
+  <!-- Bottom-left star (≈ 7 o'clock) -->
+  <use href="#star5" transform="translate(102,416)"/>
+  <!-- Bottom-right star (≈ 5 o'clock) -->
+  <use href="#star5" transform="translate(398,416)"/>
+
+  <!-- ── TURKEY MAP SILHOUETTE ───────────────────────────────────────────── -->
+  <path fill="#E30A17" d="
+    M 148,238
+    C 150,230 156,219 169,213
+    C 178,209 192,205 210,203
+    L 232,200 L 260,198 L 288,200
+    L 310,205
+    C 322,209 333,214 342,224
+    L 349,237 L 349,250
+    C 347,258 340,266 330,271
+    L 312,277
+    C 303,280 295,282 287,278
+    L 277,272 L 262,273 L 247,272
+    L 228,269
+    C 215,264 203,258 191,253
+    C 180,248 168,245 155,243
+    Z
+  "/>
+
+  <!-- ── TURKISH FLAG CRESCENT ──────────────────────────────────────────── -->
+  <!-- White outer crescent circle -->
+  <circle cx="219" cy="238" r="30" fill="white"/>
+  <!-- Red inner circle (cuts into white to form crescent, offset right) -->
+  <circle cx="233" cy="238" r="23" fill="#E30A17"/>
+
+  <!-- ── TURKISH FLAG STAR ───────────────────────────────────────────────── -->
+  <!-- 5-pointed white star to the right of the crescent -->
+  <!-- Outer r=11, inner r=4.4, center (260, 229) -->
+  <polygon
+    points="260,218 262.6,224.8 270.5,225 264.1,229.8 266.5,237.7 260,233.4 253.5,237.7 255.9,229.8 249.5,225 257.4,224.8"
+    fill="white"/>
+
+  <!-- ── INNER DECORATIVE LINE ───────────────────────────────────────────── -->
+  <line x1="175" y1="312" x2="325" y2="312" stroke="black" stroke-width="1.5"/>
+
+  <!-- ── UNIVERSITY OF VIRGINIA ──────────────────────────────────────────── -->
+  <text x="250" y="332"
+    text-anchor="middle"
+    font-family="'Times New Roman', Times, Georgia, serif"
+    font-size="17" font-weight="600" letter-spacing="1" fill="black">
+    UNIVERSITY OF VIRGINIA
+  </text>
+
+  <!-- ── EST. 2022 ───────────────────────────────────────────────────────── -->
+  <text x="250" y="358"
+    text-anchor="middle"
+    font-family="'Times New Roman', Times, Georgia, serif"
+    font-size="15" letter-spacing="4" fill="black">
+    EST. 2022
+  </text>
+
+  <!-- ── BOTTOM RING TEXT: UVA ──────────────────────────────────────────── -->
+  <!-- Positioned in the ring at the bottom, centered -->
+  <text x="250" y="457"
+    text-anchor="middle"
+    font-family="'Times New Roman', Times, Georgia, serif"
+    font-size="26" font-weight="bold" letter-spacing="14" fill="black">
+    UVA
+  </text>
+</svg>

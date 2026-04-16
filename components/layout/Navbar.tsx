@@ -85,10 +85,13 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            {/* Turkish crescent-inspired red mark */}
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm group-hover:bg-primary-700 transition-colors">
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'serif' }}>T</span>
-            </div>
+            <Image
+              src="/tsa_logo.jpg"
+              alt="Turkish Student Association at UVA"
+              width={36}
+              height={36}
+              className="flex-shrink-0 transition-opacity group-hover:opacity-85"
+            />
             <span className={`font-semibold text-sm tracking-wide hidden sm:block transition-colors ${logoColor}`}
               style={{ fontFamily: 'var(--font-playfair)' }}>
               UVA Turkish Network
@@ -132,7 +135,7 @@ export default function Navbar() {
               }`}
             >
               <Image
-                src={lang === 'en' ? '/flag-tr.svg' : '/flag-us.svg'}
+                src={lang === 'en' ? '/flag-tr.png' : '/flag-us.png'}
                 alt={lang === 'en' ? 'Turkish flag' : 'US flag'}
                 width={24}
                 height={16}
@@ -196,7 +199,7 @@ export default function Navbar() {
               }`}
             >
               <Image
-                src={lang === 'en' ? '/flag-tr.svg' : '/flag-us.svg'}
+                src={lang === 'en' ? '/flag-tr.png' : '/flag-us.png'}
                 alt={lang === 'en' ? 'Turkish flag' : 'US flag'}
                 width={22}
                 height={14}
