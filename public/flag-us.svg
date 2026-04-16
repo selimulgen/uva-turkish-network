@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400">
+  <!-- 13 stripes -->
+  <rect width="760" height="400" fill="#B22234"/>
+  <rect y="30.77" width="760" height="30.77" fill="white"/>
+  <rect y="92.31" width="760" height="30.77" fill="white"/>
+  <rect y="153.85" width="760" height="30.77" fill="white"/>
+  <rect y="215.39" width="760" height="30.77" fill="white"/>
+  <rect y="276.93" width="760" height="30.77" fill="white"/>
+  <rect y="338.46" width="760" height="30.77" fill="white"/>
+  <!-- Blue canton -->
+  <rect width="304" height="215.39" fill="#3C3B6E"/>
+  <!-- Stars (50) — simplified as a 5x6 + 4x5 grid -->
+  <g fill="white" font-size="18">
+    <!-- Row 1 (6 stars) -->
+    <text x="22" y="36">★</text><text x="62" y="36">★</text><text x="102" y="36">★</text><text x="142" y="36">★</text><text x="182" y="36">★</text><text x="222" y="36">★</text>
+    <!-- Row 2 (5 stars, offset) -->
+    <text x="42" y="66">★</text><text x="82" y="66">★</text><text x="122" y="66">★</text><text x="162" y="66">★</text><text x="202" y="66">★</text>
+    <!-- Row 3 -->
+    <text x="22" y="96">★</text><text x="62" y="96">★</text><text x="102" y="96">★</text><text x="142" y="96">★</text><text x="182" y="96">★</text><text x="222" y="96">★</text>
+    <!-- Row 4 -->
+    <text x="42" y="126">★</text><text x="82" y="126">★</text><text x="122" y="126">★</text><text x="162" y="126">★</text><text x="202" y="126">★</text>
+    <!-- Row 5 -->
+    <text x="22" y="156">★</text><text x="62" y="156">★</text><text x="102" y="156">★</text><text x="142" y="156">★</text><text x="182" y="156">★</text><text x="222" y="156">★</text>
+    <!-- Row 6 -->
+    <text x="42" y="186">★</text><text x="82" y="186">★</text><text x="122" y="186">★</text><text x="162" y="186">★</text><text x="202" y="186">★</text>
+    <!-- Row 7 -->
+    <text x="22" y="208">★</text><text x="62" y="208">★</text><text x="102" y="208">★</text><text x="142" y="208">★</text><text x="182" y="208">★</text><text x="222" y="208">★</text>
+  </g>
+</svg>

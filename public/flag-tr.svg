@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#E30A17"/>
+  <!-- White crescent -->
+  <circle cx="425" cy="400" r="200" fill="white"/>
+  <circle cx="480" cy="400" r="160" fill="#E30A17"/>
+  <!-- White star -->
+  <polygon points="583.334,400 604.19,461.803 669.134,461.803 616.805,498.197 637.662,560 583.334,521.606 529.006,560 549.862,498.197 497.533,461.803 562.478,461.803" fill="white"/>
+</svg>

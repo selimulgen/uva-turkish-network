@@ -100,7 +100,7 @@ export default function DirectoryPage() {
   };
 
   const hasActiveFilters = search || filterIndustry || filterDecade || filterCity || filterCoffee || filterMentor;
-  const cities = [...new Set(alumni.map(a => a.city).filter(Boolean))].sort() as string[];
+  const cities = Array.from(new Set(alumni.map(a => a.city).filter(Boolean))).sort() as string[];
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50">

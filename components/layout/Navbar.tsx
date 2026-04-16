@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile } from '@/lib/types';
 import { getInitials } from '@/lib/utils';
+import Image from 'next/image';
 import { Menu, X, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 
 export default function Navbar() {
@@ -123,14 +124,19 @@ export default function Navbar() {
             <button
               onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
               title={lang === 'en' ? 'Türkçeye geç' : 'Switch to English'}
-              className={`ml-2 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold border transition-colors ${
+              className={`ml-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors ${
                 isLanding && !scrolled
-                  ? 'border-white/30 text-white hover:bg-white/10'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'border-white/30 hover:bg-white/10'
+                  : 'border-gray-200 hover:bg-gray-50'
               }`}
             >
-              <span className="text-base leading-none">{lang === 'en' ? '🇹🇷' : '🇺🇸'}</span>
-              <span className="text-xs">{lang === 'en' ? 'TR' : 'EN'}</span>
+              <Image
+                src={lang === 'en' ? '/flag-tr.svg' : '/flag-us.svg'}
+                alt={lang === 'en' ? 'Turkish flag' : 'US flag'}
+                width={24}
+                height={16}
+                className="rounded-sm object-cover"
+              />
             </button>
 
             {/* User dropdown */}
@@ -177,13 +183,19 @@ export default function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border transition-colors ${
                 isLanding && !scrolled
-                  ? 'border-white/30 text-white hover:bg-white/10'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'border-white/30 hover:bg-white/10'
+                  : 'border-gray-200 hover:bg-gray-50'
               }`}
             >
-              <span>{lang === 'en' ? '🇹🇷' : '🇺🇸'}</span>
+              <Image
+                src={lang === 'en' ? '/flag-tr.svg' : '/flag-us.svg'}
+                alt={lang === 'en' ? 'Turkish flag' : 'US flag'}
+                width={22}
+                height={14}
+                className="rounded-sm object-cover"
+              />
             </button>
             <button onClick={() => setMenuOpen(!menuOpen)}
               className={`p-2 transition-colors ${isLanding && !scrolled ? 'text-white' : 'text-gray-600'}`}>
