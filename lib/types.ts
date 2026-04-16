@@ -34,6 +34,7 @@ export interface Profile {
   uva_school?: string | null;      // primary school
   uva_programs?: Array<{           // all programs (index 0 = primary major)
     type: 'major' | 'minor';
+    level?: string;               // EducationLevel — set on additional entries (Double Hoos)
     school: string;
     program: string;
     customProgram?: string;
