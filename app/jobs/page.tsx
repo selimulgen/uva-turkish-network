@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -26,23 +27,26 @@ export default function JobsPage() {
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
-    const authRes = await supabase.auth.getUser();
-    const user    = authRes.data.user;
+    try {
+      const authRes = await supabase.auth.getUser();
+      const user    = authRes.data.user;
 
-    const [jobsRes, profileRes] = await Promise.all([
-      supabase.from('jobs')
-        .select('*, profiles(id, full_name, email, linkedin_url, show_contact_info)')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false }),
-      user ? supabase.from('profiles').select('*').eq('id', user.id).single() : Promise.resolve({ data: null }),
-    ]);
+      const [jobsRes, profileRes] = await Promise.all([
+        supabase.from('jobs')
+          .select('*, profiles(id, full_name, email, linkedin_url, show_contact_info)')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false }),
+        user ? supabase.from('profiles').select('*').eq('id', user.id).single() : Promise.resolve({ data: null }),
+      ]);
 
-    setJobs((jobsRes.data as unknown as Job[]) || []);
-    if (profileRes.data) setCurrentUser(profileRes.data as Profile);
-    setLoading(false);
+      setJobs((jobsRes.data as unknown as Job[]) || []);
+      if (profileRes.data) setCurrentUser(profileRes.data as Profile);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useVisibilityRefetch(fetchData);
 
   useEffect(() => {
     let result = [...jobs];

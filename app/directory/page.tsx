@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
@@ -38,21 +39,24 @@ export default function DirectoryPage() {
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login'); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login'); return; }
 
-    const alumniRes = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('role', 'alumni')
-      .eq('profile_completed', true)
-      .order('created_at', { ascending: false });
+      const alumniRes = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'alumni')
+        .eq('profile_completed', true)
+        .order('created_at', { ascending: false });
 
-    if (alumniRes.data) setAlumni(alumniRes.data as Profile[]);
-    setLoading(false);
+      if (alumniRes.data) setAlumni(alumniRes.data as Profile[]);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, router]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useVisibilityRefetch(fetchData);
 
   useEffect(() => {
     let result = [...alumni];

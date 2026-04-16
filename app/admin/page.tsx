@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -25,33 +26,36 @@ export default function AdminPage() {
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login'); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login'); return; }
 
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    if (!profile || profile.role !== 'admin') { router.push('/dashboard'); return; }
-    setAdminProfile(profile as Profile);
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      if (!profile || profile.role !== 'admin') { router.push('/dashboard'); return; }
+      setAdminProfile(profile as Profile);
 
-    const [usersRes, jobsRes] = await Promise.all([
-      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('jobs').select('*, profiles(full_name)').order('created_at', { ascending: false }),
-    ]);
+      const [usersRes, jobsRes] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*, profiles(full_name)').order('created_at', { ascending: false }),
+      ]);
 
-    const allUsers = (usersRes.data as Profile[]) || [];
-    const allJobs  = (jobsRes.data as unknown as Job[]) || [];
+      const allUsers = (usersRes.data as Profile[]) || [];
+      const allJobs  = (jobsRes.data as unknown as Job[]) || [];
 
-    setUsers(allUsers);
-    setJobs(allJobs);
-    setStats({
-      total:    allUsers.length,
-      students: allUsers.filter(u => u.role === 'student').length,
-      alumni:   allUsers.filter(u => u.role === 'alumni').length,
-      jobs:     allJobs.filter(j => j.is_active).length,
-    });
-    setLoading(false);
+      setUsers(allUsers);
+      setJobs(allJobs);
+      setStats({
+        total:    allUsers.length,
+        students: allUsers.filter(u => u.role === 'student').length,
+        alumni:   allUsers.filter(u => u.role === 'alumni').length,
+        jobs:     allJobs.filter(j => j.is_active).length,
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, router]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useVisibilityRefetch(fetchData);
 
   const deleteUser = async (userId: string) => {
     if (!confirm(t.admin.deleteWarning)) return;

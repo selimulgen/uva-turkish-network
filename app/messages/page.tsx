@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -36,72 +37,74 @@ function MessagesContent() {
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 
   const fetchData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login'); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login'); return; }
 
-    const [profileRes, msgRes, alumniRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase.from('messages')
-        .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
-        .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
-        .order('created_at', { ascending: true }),
-      supabase.from('profiles').select('*').eq('role', 'alumni').neq('id', user.id),
-    ]);
+      const [profileRes, msgRes, alumniRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('messages')
+          .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
+          .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
+          .order('created_at', { ascending: true }),
+        supabase.from('profiles').select('*').eq('role', 'alumni').neq('id', user.id),
+      ]);
 
-    if (!profileRes.data || profileRes.data.role !== 'alumni') {
-      router.push('/dashboard');
-      return;
-    }
-
-    const myProfile = profileRes.data as Profile;
-    setProfile(myProfile);
-    setAllAlumni((alumniRes.data as Profile[]) || []);
-
-    const messages = (msgRes.data as unknown as Message[]) || [];
-    const partnerMap = new Map<string, { messages: Message[]; partner: Profile }>();
-
-    for (const msg of messages) {
-      const partnerId = msg.from_user === myProfile.id ? msg.to_user : msg.from_user;
-      const partner   = (msg.from_user === myProfile.id ? msg.to_profile : msg.from_profile) as Profile;
-      if (!partner) continue;
-
-      if (!partnerMap.has(partnerId)) {
-        partnerMap.set(partnerId, { messages: [], partner });
+      if (!profileRes.data || profileRes.data.role !== 'alumni') {
+        router.push('/dashboard');
+        return;
       }
-      partnerMap.get(partnerId)!.messages.push(msg);
-    }
 
-    const builtThreads: Thread[] = Array.from(partnerMap.values()).map(({ messages: msgs, partner }) => ({
-      partner,
-      messages: msgs,
-      unreadCount: msgs.filter(m => !m.is_read && m.to_user === myProfile.id).length,
-    }));
+      const myProfile = profileRes.data as Profile;
+      setProfile(myProfile);
+      setAllAlumni((alumniRes.data as Profile[]) || []);
 
-    builtThreads.sort((a, b) => {
-      const aLast = a.messages[a.messages.length - 1]?.created_at || '';
-      const bLast = b.messages[b.messages.length - 1]?.created_at || '';
-      return bLast.localeCompare(aLast);
-    });
+      const messages = (msgRes.data as unknown as Message[]) || [];
+      const partnerMap = new Map<string, { messages: Message[]; partner: Profile }>();
 
-    setThreads(builtThreads);
+      for (const msg of messages) {
+        const partnerId = msg.from_user === myProfile.id ? msg.to_user : msg.from_user;
+        const partner   = (msg.from_user === myProfile.id ? msg.to_profile : msg.from_profile) as Profile;
+        if (!partner) continue;
 
-    const withId = searchParams.get('with');
-    if (withId) {
-      const existing = builtThreads.find(th => th.partner.id === withId);
-      if (existing) {
-        setActiveThread(existing);
-      } else {
-        const { data: partnerProfile } = await supabase.from('profiles').select('*').eq('id', withId).single();
-        if (partnerProfile) {
-          setActiveThread({ partner: partnerProfile as Profile, messages: [], unreadCount: 0 });
+        if (!partnerMap.has(partnerId)) {
+          partnerMap.set(partnerId, { messages: [], partner });
+        }
+        partnerMap.get(partnerId)!.messages.push(msg);
+      }
+
+      const builtThreads: Thread[] = Array.from(partnerMap.values()).map(({ messages: msgs, partner }) => ({
+        partner,
+        messages: msgs,
+        unreadCount: msgs.filter(m => !m.is_read && m.to_user === myProfile.id).length,
+      }));
+
+      builtThreads.sort((a, b) => {
+        const aLast = a.messages[a.messages.length - 1]?.created_at || '';
+        const bLast = b.messages[b.messages.length - 1]?.created_at || '';
+        return bLast.localeCompare(aLast);
+      });
+
+      setThreads(builtThreads);
+
+      const withId = searchParams.get('with');
+      if (withId) {
+        const existing = builtThreads.find(th => th.partner.id === withId);
+        if (existing) {
+          setActiveThread(existing);
+        } else {
+          const { data: partnerProfile } = await supabase.from('profiles').select('*').eq('id', withId).single();
+          if (partnerProfile) {
+            setActiveThread({ partner: partnerProfile as Profile, messages: [], unreadCount: 0 });
+          }
         }
       }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, [supabase, router, searchParams]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useVisibilityRefetch(fetchData);
   useEffect(() => { scrollToBottom(); }, [activeThread?.messages.length]);
 
   const sendMessage = async () => {

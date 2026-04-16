@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import { createClient } from '@/lib/supabase/client';
@@ -23,20 +24,23 @@ export default function EditProfilePage() {
   const { t }    = useLanguage();
 
   const fetchProfile = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login'); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login'); return; }
 
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (data) setProfile(data as Profile);
-    setLoading(false);
+      if (data) setProfile(data as Profile);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, router]);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  useVisibilityRefetch(fetchProfile);
 
   const update = (field: keyof Profile, value: unknown) => {
     setProfile(prev => ({ ...prev, [field]: value }));

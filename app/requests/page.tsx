@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
@@ -28,23 +29,26 @@ export default function RequestsPage() {
   };
 
   const fetchData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login'); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login'); return; }
 
-    const [profileRes, reqRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase.from('requests')
-        .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
-        .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
-        .order('created_at', { ascending: false }),
-    ]);
+      const [profileRes, reqRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('requests')
+          .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
+          .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
+          .order('created_at', { ascending: false }),
+      ]);
 
-    if (profileRes.data) setProfile(profileRes.data as Profile);
-    setRequests((reqRes.data as unknown as NetworkRequest[]) || []);
-    setLoading(false);
+      if (profileRes.data) setProfile(profileRes.data as Profile);
+      setRequests((reqRes.data as unknown as NetworkRequest[]) || []);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, router]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useVisibilityRefetch(fetchData);
 
   const updateStatus = async (reqId: string, status: 'accepted' | 'declined') => {
     await supabase.from('requests').update({ status }).eq('id', reqId);
