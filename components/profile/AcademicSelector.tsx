@@ -76,7 +76,7 @@ function ProgramRow({
       {/* School */}
       <select
         value={school}
-        onChange={e => { onSchoolChange(e.target.value); onProgramChange(''); }}
+        onChange={e => onSchoolChange(e.target.value)}
         className={selectClass}
       >
         <option value="">Select school within UVA…</option>
@@ -87,7 +87,7 @@ function ProgramRow({
       {school && (
         <select
           value={program}
-          onChange={e => { onProgramChange(e.target.value); onCustomChange(''); }}
+          onChange={e => onProgramChange(e.target.value)}
           className={selectClass}
         >
           <option value="">Select {type}…</option>
