@@ -542,5 +542,6 @@ const translations = {
   },
 } as const;
 
-export type Translations = typeof translations.en;
+// Widen the type so both EN and TR satisfy it (avoids literal-type mismatch)
+export type Translations = typeof translations[Lang];
 export default translations;
