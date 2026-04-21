@@ -42,6 +42,49 @@ export const LOOKING_FOR_OPTIONS = [
   { value: 'networking',  label: 'General Networking' },
 ];
 
+// Topics alumni can offer help on
+export const CAN_HELP_WITH_OPTIONS = [
+  'Consulting Recruiting',
+  'Investment Banking',
+  'Product Management',
+  'Software Engineering',
+  'Law School Applications',
+  'Medical School Applications',
+  'Startup & Entrepreneurship',
+  'Visa / Immigration',
+  'Graduate School Applications',
+  'Interview Prep',
+  'Networking & Career Development',
+  'Career Switching',
+  'Real Estate',
+  'Data Science & ML',
+  'Government & Policy',
+];
+
+// Industries / fields students are targeting
+export const CAREER_INTEREST_OPTIONS = [
+  'Technology',
+  'Finance & Banking',
+  'Consulting',
+  'Healthcare & Medicine',
+  'Law',
+  'Education',
+  'Government & Policy',
+  'Non-profit',
+  'Real Estate',
+  'Media & Entertainment',
+  'Engineering',
+  'Research & Academia',
+  'Entrepreneurship',
+  'Energy',
+];
+
+export const AVAILABILITY_OPTIONS = [
+  { value: 'virtual',   label: 'Virtual only' },
+  { value: 'in_person', label: 'In-person welcome' },
+  { value: 'either',    label: 'Either works' },
+];
+
 export const JOB_TYPE_LABELS: Record<string, string> = {
   full_time:  'Full-time',
   internship: 'Internship',

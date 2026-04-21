@@ -3,6 +3,13 @@ export type JobType  = 'full_time' | 'internship' | 'referral';
 export type RequestType   = 'coffee_chat' | 'mentorship';
 export type RequestStatus = 'pending' | 'accepted' | 'declined';
 
+export interface WorkEntry {
+  role: string;
+  company: string;
+  start_year: number | null;
+  end_year: number | null; // null = Present
+}
+
 export interface Profile {
   id: string;
   email: string;
@@ -40,6 +47,23 @@ export interface Profile {
     program: string;
     customProgram?: string;
   }> | null;
+
+  // ── Alumni enrichment (all optional) ──────────────────────────
+  work_history?: WorkEntry[] | null;
+  can_help_with?: string[] | null;
+  hometown?: string | null;
+  availability_preference?: 'virtual' | 'in_person' | 'either' | null;
+  availability_note?: string | null;
+  advice_snippet?: string | null;
+
+  // ── Student enrichment (all optional) ─────────────────────────
+  career_interests?: string[] | null;
+  portfolio_url?: string | null;
+  extracurriculars?: string[] | null;
+  high_school_name?: string | null;
+  high_school_country?: string | null;        // 'Turkey' | 'Other'
+  high_school_other_country?: string | null;  // filled when high_school_country === 'Other'
+  high_school_city?: string | null;
 
   profile_completed: boolean;
   created_at: string;
