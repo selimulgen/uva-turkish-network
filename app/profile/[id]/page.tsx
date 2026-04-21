@@ -28,6 +28,14 @@ export default function ProfilePage() {
   const [reqMessage, setReqMessage]   = useState('');
   const [reqSent, setReqSent]         = useState(false);
   const [existingReq, setExistingReq] = useState<string | null>(null);
+  const [lightbox, setLightbox]       = useState(false);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightbox(false); };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [lightbox]);
 
   const profileId = params.id as string;
 
@@ -121,7 +129,8 @@ export default function ProfilePage() {
                 <img
                   src={profile.avatar_url}
                   alt={profile.full_name || 'Profile'}
-                  className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md"
+                  onClick={() => setLightbox(true)}
+                  className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md cursor-zoom-in hover:opacity-90 transition-opacity"
                 />
               ) : (
                 <div className="w-20 h-20 rounded-2xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-md">
@@ -335,6 +344,28 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Photo lightbox */}
+      {lightbox && profile.avatar_url && (
+        <div
+          onClick={() => setLightbox(false)}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 cursor-zoom-out"
+        >
+          <button
+            onClick={() => setLightbox(false)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+          >
+            <X size={28} />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={profile.avatar_url}
+            alt={profile.full_name || 'Profile'}
+            onClick={e => e.stopPropagation()}
+            className="max-h-[85vh] max-w-[85vw] rounded-2xl shadow-2xl object-contain"
+          />
         </div>
       )}
 
