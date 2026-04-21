@@ -28,8 +28,8 @@ export default function JobsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const authRes = await supabase.auth.getUser();
-      const user    = authRes.data.user;
+      const authRes = await supabase.auth.getSession();
+      const user    = authRes.data.session?.user ?? null;
 
       const [jobsRes, profileRes] = await Promise.all([
         supabase.from('jobs')
@@ -71,7 +71,7 @@ export default function JobsPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -83,9 +83,9 @@ export default function JobsPage() {
   const isLoggedIn = !!currentUser;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 pt-24 pb-16">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -147,13 +147,13 @@ export default function JobsPage() {
               const showContact = isLoggedIn && job.profiles?.show_contact_info;
 
               return (
-                <div key={job.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div key={job.id} className="bg-white rounded-lg border border-[#E2D8CC] overflow-hidden">
                   {/* Main row */}
                   <div
-                    className="flex items-start gap-4 p-5 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-start gap-4 p-5 cursor-pointer hover:bg-[#F4EFE6] transition-colors"
                     onClick={() => setExpandedJob(isExpanded ? null : job.id)}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#F4EFE6] border border-[#E2D8CC] flex items-center justify-center flex-shrink-0">
                       <Building2 size={20} className="text-gray-300" />
                     </div>
 
@@ -187,7 +187,7 @@ export default function JobsPage() {
 
                   {/* Expanded detail */}
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-0 border-t border-gray-100">
+                    <div className="px-5 pb-5 pt-0 border-t border-[#E2D8CC] bg-[#F4EFE6]">
                       <p className="text-gray-600 text-sm leading-relaxed mt-4 mb-5 whitespace-pre-line">
                         {job.description}
                       </p>

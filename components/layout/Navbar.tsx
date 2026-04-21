@@ -11,10 +11,11 @@ import Image from 'next/image';
 import { Menu, X, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 
 export default function Navbar() {
-  const [user, setUser]         = useState<Profile | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dropOpen, setDropOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [user, setUser]               = useState<Profile | null>(null);
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [dropOpen, setDropOpen]       = useState(false);
+  const [scrolled, setScrolled]       = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const router   = useRouter();
   const pathname = usePathname();
   const supabase = useMemo(() => createClient(), []);
@@ -22,11 +23,23 @@ export default function Navbar() {
 
   const isLanding = pathname === '/';
 
+  const fetchUnread = async (userId: string) => {
+    const { count } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('to_user', userId)
+      .eq('is_read', false);
+    setUnreadCount(count ?? 0);
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
       if (!authUser) return;
       const { data } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
-      if (data) setUser(data as Profile);
+      if (data) {
+        setUser(data as Profile);
+        fetchUnread(authUser.id);
+      }
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -35,15 +48,27 @@ export default function Navbar() {
       } else if (session?.user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
         if (data) setUser(data as Profile);
+        fetchUnread(session.user.id);
       }
     });
 
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll);
 
+    let currentUserId: string | null = null;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      currentUserId = session?.user?.id ?? null;
+    });
+
+    const onUnreadUpdated = () => {
+      if (currentUserId) fetchUnread(currentUserId);
+    };
+    window.addEventListener('unread-updated', onUnreadUpdated);
+
     return () => {
       listener.subscription.unsubscribe();
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('unread-updated', onUnreadUpdated);
     };
   }, []);
 
@@ -62,7 +87,7 @@ export default function Navbar() {
         { href: '/students',   label: t.nav.students },
         { href: '/jobs',       label: t.nav.opportunities },
         { href: '/requests',   label: t.nav.requests },
-        ...(user.role === 'alumni' ? [{ href: '/messages', label: t.nav.messages }] : []),
+        { href: '/messages', label: t.nav.messages },
         ...(user.role === 'admin'  ? [{ href: '/admin',    label: t.nav.admin }]    : []),
       ]
     : [
@@ -73,7 +98,7 @@ export default function Navbar() {
   // Navbar background: white always except on landing before scroll
   const navBg = isLanding && !scrolled
     ? 'bg-transparent'
-    : 'bg-white shadow-sm border-b border-gray-100';
+    : 'bg-white border-b border-[#E2D8CC]';
 
   const textColor = isLanding && !scrolled ? 'text-white' : 'text-gray-700';
   const logoColor = isLanding && !scrolled ? 'text-white' : 'text-gray-900';
@@ -104,13 +129,16 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? 'bg-primary-50 text-primary-600'
-                    : `${textColor} hover:bg-gray-100 hover:text-gray-900`
+                    ? 'bg-[#F4EFE6] text-[#C4001A]'
+                    : `${textColor} hover:bg-[#F4EFE6] hover:text-gray-900`
                 }`}
               >
                 {link.label}
+                {link.href === '/messages' && unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#C4001A] rounded-full" />
+                )}
               </Link>
             ))}
 
@@ -221,8 +249,8 @@ export default function Navbar() {
             <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
               className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === link.href
-                  ? 'bg-primary-50 text-primary-600'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-[#F4EFE6] text-[#C4001A]'
+                  : 'text-gray-700 hover:bg-[#F4EFE6]'
               }`}>
               {link.label}
             </Link>

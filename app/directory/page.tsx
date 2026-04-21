@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { createClient } from '@/lib/supabase/client';
+import { getAuthUserId } from '@/lib/supabase/getAuthUserId';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile } from '@/lib/types';
 import { INDUSTRIES, getInitials } from '@/lib/utils';
-import { Search, MapPin, Building2, GraduationCap, Coffee, BookOpen, SlidersHorizontal, X } from 'lucide-react';
+import { Search, MapPin, Coffee, BookOpen, SlidersHorizontal, X, ArrowRight } from 'lucide-react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const DECADE_GROUPS = [
@@ -40,8 +41,8 @@ export default function DirectoryPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login'); return; }
+      const userId = await getAuthUserId();
+      if (!userId) { router.push('/auth/login'); return; }
 
       const alumniRes = await supabase
         .from('profiles')
@@ -108,7 +109,7 @@ export default function DirectoryPage() {
   const cities = Array.from(new Set(alumni.map(a => a.city).filter(Boolean))).sort() as string[];
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -117,9 +118,9 @@ export default function DirectoryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-24 pb-16">
 
         {/* Header */}
         <div className="mb-8">
@@ -135,7 +136,7 @@ export default function DirectoryPage() {
         </div>
 
         {/* Search + filter bar */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-lg border border-[#E2D8CC] p-4 mb-6">
           <div className="flex gap-3">
             <div className="flex-1 relative">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -168,7 +169,7 @@ export default function DirectoryPage() {
           </div>
 
           {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-100 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="mt-4 pt-4 border-t border-[#E2D8CC] grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
                 <label className="block mb-1.5 text-xs font-medium text-gray-600">{t.directory.industry}</label>
                 <select value={filterIndustry} onChange={e => setFilterIndustry(e.target.value)}
@@ -233,60 +234,65 @@ export default function DirectoryPage() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filtered.map(alumnus => (
-              <Link key={alumnus.id} href={`/profile/${alumnus.id}`}
-                className="bg-white rounded-2xl border border-gray-100 p-5 card-hover group block shadow-sm">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 font-bold text-lg">
-                    {getInitials(alumnus.full_name || alumnus.email)}
+              <div key={alumnus.id} className="bg-white rounded-lg border border-[#E2D8CC] card-hover overflow-hidden">
+                {/* Colored top band with avatar */}
+                <div className="h-16 bg-[#C4001A] relative">
+                  <div className="absolute -bottom-5 left-5">
+                    <div className="w-12 h-12 rounded-lg bg-white border-2 border-white flex items-center justify-center text-[#C4001A] font-bold text-sm shadow-sm overflow-hidden">
+                      {alumnus.avatar_url
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={alumnus.avatar_url} alt="" className="w-full h-full object-cover" />
+                        : getInitials(alumnus.full_name || alumnus.email)
+                      }
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1 items-end">
+                </div>
+
+                {/* Card body */}
+                <div className="px-5 pt-8 pb-5">
+                  <h3 className="font-semibold text-gray-900 text-sm leading-tight">{alumnus.full_name || 'Anonymous'}</h3>
+                  {alumnus.current_role && alumnus.company && (
+                    <p className="text-xs text-gray-500 mt-0.5">{alumnus.current_role} · {alumnus.company}</p>
+                  )}
+                  {!alumnus.company && alumnus.current_role && (
+                    <p className="text-xs text-gray-500 mt-0.5">{alumnus.current_role}</p>
+                  )}
+
+                  {alumnus.uva_graduation_year && (
+                    <p className="text-xs text-[#C4001A] font-medium mt-1">Class of {alumnus.uva_graduation_year}</p>
+                  )}
+
+                  {alumnus.city && (
+                    <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
+                      <MapPin size={10} /><span>{alumnus.city}</span>
+                    </div>
+                  )}
+
+                  {alumnus.industry && (
+                    <span className="inline-block mt-3 text-xs bg-[#F4EFE6] border border-[#E2D8CC] text-gray-600 rounded-full px-2.5 py-0.5">
+                      {alumnus.industry}
+                    </span>
+                  )}
+
+                  <div className="flex gap-1.5 mt-3">
                     {alumnus.open_to_coffee_chat && (
-                      <span title="Open to coffee chat" className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                        <Coffee size={11} className="text-amber-600" />
+                      <span className="inline-flex items-center gap-1 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-2 py-0.5">
+                        <Coffee size={9} /> Coffee
                       </span>
                     )}
                     {alumnus.open_to_mentorship && (
-                      <span title="Open to mentorship" className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                        <BookOpen size={11} className="text-blue-600" />
+                      <span className="inline-flex items-center gap-1 text-xs bg-blue-50 border border-blue-200 text-blue-700 rounded-full px-2 py-0.5">
+                        <BookOpen size={9} /> Mentor
                       </span>
                     )}
                   </div>
+
+                  <Link href={`/profile/${alumnus.id}`}
+                    className="mt-4 flex items-center gap-1 text-xs font-semibold text-[#C4001A] hover:gap-2 transition-all">
+                    View profile <ArrowRight size={11} />
+                  </Link>
                 </div>
-
-                <h3 className="font-bold text-gray-900 text-sm mb-1 group-hover:text-primary-600 transition-colors line-clamp-1">
-                  {alumnus.full_name || 'Anonymous'}
-                </h3>
-
-                {alumnus.current_role && (
-                  <p className="text-gray-600 text-xs font-medium mb-0.5 flex items-center gap-1 line-clamp-1">
-                    <Building2 size={10} className="text-gray-400 flex-shrink-0" />
-                    {alumnus.current_role}
-                  </p>
-                )}
-
-                {alumnus.company && (
-                  <p className="text-gray-400 text-xs mb-2 line-clamp-1">{alumnus.company}</p>
-                )}
-
-                <div className="flex items-center gap-2 mt-3 flex-wrap">
-                  {alumnus.city && (
-                    <span className="flex items-center gap-0.5 text-xs text-gray-400">
-                      <MapPin size={10} /> {alumnus.city}
-                    </span>
-                  )}
-                  {alumnus.uva_graduation_year && (
-                    <span className="flex items-center gap-0.5 text-xs text-gray-400">
-                      <GraduationCap size={10} /> &apos;{String(alumnus.uva_graduation_year).slice(-2)}
-                    </span>
-                  )}
-                </div>
-
-                {alumnus.industry && (
-                  <span className="mt-3 inline-block text-xs bg-gray-50 text-gray-600 px-2.5 py-1 rounded-full border border-gray-100">
-                    {alumnus.industry}
-                  </span>
-                )}
-              </Link>
+              </div>
             ))}
           </div>
         )}

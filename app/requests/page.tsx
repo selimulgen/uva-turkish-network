@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { createClient } from '@/lib/supabase/client';
+import { getAuthUserId } from '@/lib/supabase/getAuthUserId';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile, NetworkRequest } from '@/lib/types';
 import { getInitials, formatRelativeDate } from '@/lib/utils';
@@ -30,14 +31,14 @@ export default function RequestsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login'); return; }
+      const userId = await getAuthUserId();
+      if (!userId) { router.push('/auth/login'); return; }
 
       const [profileRes, reqRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('profiles').select('*').eq('id', userId).single(),
         supabase.from('requests')
           .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
-          .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
+          .or(`from_user.eq.${userId},to_user.eq.${userId}`)
           .order('created_at', { ascending: false }),
       ]);
 
@@ -60,7 +61,7 @@ export default function RequestsPage() {
   const outgoing = requests.filter(r => r.from_user === profile?.id);
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -71,9 +72,9 @@ export default function RequestsPage() {
   const currentList = tab === 'incoming' ? incoming : outgoing;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <div className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 pt-24 pb-16">
 
         <div className="mb-8">
           <p className="text-primary-600 text-xs font-bold tracking-widest uppercase mb-2">{t.requests.eyebrow}</p>
@@ -84,17 +85,17 @@ export default function RequestsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white border border-gray-100 rounded-xl p-1 mb-6 w-fit shadow-sm">
+        <div className="inline-flex bg-white border border-[#E2D8CC] rounded-full p-1 mb-8">
           {(['incoming', 'outgoing'] as const).map(tabKey => (
             <button key={tabKey} onClick={() => setTab(tabKey)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                tab === tabKey ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-900'
+              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                tab === tabKey
+                  ? 'bg-[#C4001A] text-white'
+                  : 'text-gray-500 hover:text-gray-800'
               }`}>
               {tabKey === 'incoming' ? t.requests.incoming : t.requests.outgoing}
-              {tabKey === 'incoming' && incoming.filter(r => r.status === 'pending').length > 0 && (
-                <span className="ml-1.5 bg-uva-orange text-white text-xs rounded-full px-1.5 py-0.5">
-                  {incoming.filter(r => r.status === 'pending').length}
-                </span>
+              {tabKey === 'incoming' && incoming.length > 0 && (
+                <span className="ml-2 bg-white/20 rounded-full px-1.5 py-0.5 text-xs">{incoming.length}</span>
               )}
             </button>
           ))}
@@ -102,8 +103,8 @@ export default function RequestsPage() {
 
         {/* Request list */}
         {currentList.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+          <div className="text-center py-16 bg-white rounded-lg border border-[#E2D8CC]">
+            <div className="w-12 h-12 bg-[#F4EFE6] rounded-full flex items-center justify-center mx-auto mb-3">
               {tab === 'incoming'
                 ? <Coffee size={20} className="text-gray-400" />
                 : <BookOpen size={20} className="text-gray-400" />
@@ -126,10 +127,10 @@ export default function RequestsPage() {
               const isPending = req.status === 'pending';
 
               return (
-                <div key={req.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div key={req.id} className="bg-white rounded-lg border border-[#E2D8CC] p-5">
                   <div className="flex items-start gap-4">
                     <Link href={`/profile/${other?.id}`}>
-                      <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 font-bold text-base flex-shrink-0 hover:bg-primary-100 transition-colors">
+                      <div className="w-12 h-12 rounded-xl bg-[#F4EFE6] flex items-center justify-center text-[#C4001A] font-bold text-base flex-shrink-0 hover:bg-[#E2D8CC] transition-colors">
                         {getInitials(other?.full_name || '?')}
                       </div>
                     </Link>
@@ -165,7 +166,7 @@ export default function RequestsPage() {
                       </div>
 
                       {req.message && (
-                        <p className="text-sm text-gray-600 mt-3 p-3 bg-gray-50 rounded-xl leading-relaxed">
+                        <p className="text-sm text-gray-600 mt-3 p-3 bg-[#F4EFE6] rounded-xl leading-relaxed">
                           {req.message}
                         </p>
                       )}
@@ -173,7 +174,7 @@ export default function RequestsPage() {
                       {tab === 'incoming' && isPending && profile?.role === 'alumni' && (
                         <div className="flex gap-2 mt-4">
                           <button onClick={() => updateStatus(req.id, 'accepted')}
-                            className="flex items-center gap-1.5 bg-green-600 text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-green-700 transition-colors">
+                            className="flex items-center gap-1.5 bg-[#C4001A] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#a3001a] transition-colors">
                             <CheckCircle size={13} /> {t.requests.accept}
                           </button>
                           <button onClick={() => updateStatus(req.id, 'declined')}

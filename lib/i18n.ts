@@ -151,6 +151,116 @@ const translations = {
       messageOpt:       'Message (optional)',
       sendRequest:      'Send Request',
       requestSent:      'Request sent',
+
+      // ── Profile completeness ──────────────────────────────────────────────
+      profileCompletenessTitle: 'Profile completeness',
+      stillMissing:         'Still missing',
+      missing:              'Missing',
+      profileCompletePrefix:'Your profile is',
+      profileCompleteSuffix:'% complete',
+      completeItLink:       'Complete it →',
+      profileNotFound:      'Profile not found.',
+      anonymous:            'Anonymous',
+
+      // Completeness field labels
+      fieldPhoto:           'Profile photo',
+      fieldBio:             'Bio',
+      fieldAcademic:        'Academic background',
+      fieldGradYear:        'Graduation year',
+      fieldCurrentRole:     'Current role',
+      fieldCompany:         'Company',
+      fieldIndustry:        'Industry',
+      fieldCity:            'City',
+      fieldLinkedIn:        'LinkedIn',
+      fieldCanHelp:         '"Can help with" topics',
+      fieldLookingFor:      '"Looking for" interests',
+      fieldCareerInterests: 'Career interests',
+      fieldHighSchoolInfo:  'High school info',
+      fieldPortfolio:       'Portfolio / resume',
+
+      // ── UVA Academic section ──────────────────────────────────────────────
+      uvaAcademicSub:       'Select your degree level, school, and program(s) at UVA. Use "Add another major or minor" to list up to 4 total.',
+
+      // ── Current position ──────────────────────────────────────────────────
+      selectIndustry:       'Select industry',
+      hometown:             'Hometown',
+      fromCity:             'From',
+
+      // ── Work history ──────────────────────────────────────────────────────
+      workHistory:          'Work History',
+      workHistorySub:       'Past roles beyond your current position. Helps students understand your career path.',
+      addPosition:          'Add position',
+      addPastPosition:      'Add a past position',
+      workRole:             'Role',
+      workCompany:          'Company',
+      workStartYear:        'Start year',
+      workEndYear:          'End year',
+      workEndYearBlank:     'leave blank if current',
+      careerPath:           'Career path',
+      currentBadge:         'Current',
+      present:              'Present',
+
+      // ── Can help with ─────────────────────────────────────────────────────
+      canHelpWithTitle:     'What Can You Help With?',
+      canHelpWithSub:       "Select the topics you're comfortable advising students on. This shows on your profile.",
+      canHelpWithView:      'Can help with',
+
+      // ── Advice / Quote ────────────────────────────────────────────────────
+      adviceQuote:          'Advice or Quote',
+      adviceQuoteSub:       "Entirely up to you. Share a piece of advice, a career reflection, a quote you live by, or anything else you'd want a student to read before reaching out. This is shown prominently on your profile.",
+      adviceQuotePlaceholder: 'e.g. "Don\'t optimize your career for prestige — optimize it for learning."',
+      adviceSays:           'says',
+
+      // ── Meeting preference / availability ─────────────────────────────────
+      meetingPref:          'Meeting preference',
+      meetingPrefSub:       'How do you prefer to connect with students?',
+      availabilityNote:     'Availability note',
+      availabilityNotePlaceholder: 'e.g. I usually respond within a week',
+      availabilityNoteView: 'Availability note',
+      availVirtual:         'Virtual only',
+      availInPerson:        'In-person welcome',
+      availEither:          'Either works',
+
+      // ── What you have in common ───────────────────────────────────────────
+      commonality:          'What you have in common',
+      commonBothStudiedAt:  'Both studied at',
+      commonBothStudied:    'Both studied',
+      commonTargeting:      "You're targeting",
+      commonTurkeyRoots:    'You both have roots in Turkey',
+      commonBothFrom:       'Both from',
+
+      // ── Career interests (student) ────────────────────────────────────────
+      careerInterestsTitle: 'Career Interests',
+      careerInterestsSub:   "Which fields or industries are you targeting? Alumni in these areas will know you're interested.",
+      careerInterestsView:  'Career interests',
+
+      // ── Extracurriculars (student) ────────────────────────────────────────
+      extracurriculars:     'Extracurriculars & Involvement',
+      extracurricularsSub:  'UVA clubs, organizations, sports, or any other activities. Type one and press Enter to add.',
+      extracurricularsPlaceholder: 'e.g. Turkish Student Association',
+      addBtn:               'Add',
+      involvement:          'Involvement',
+
+      // ── High school (student) ─────────────────────────────────────────────
+      highSchool:           'High School',
+      highSchoolSub:        'Optional. Helps alumni and fellow students find shared roots.',
+      schoolName:           'School Name',
+      schoolNamePlaceholder:'e.g. Robert College',
+      whereWasIt:           'Where was it?',
+      inTurkey:             'Turkey',
+      outsideTurkey:        'Outside Turkey',
+      cityInTurkey:         'City in Turkey',
+      cityInTurkeyPlaceholder: 'e.g. Istanbul',
+      hsCountry:            'Country',
+      hsCountryPlaceholder: 'e.g. United States',
+      hsCityPlaceholder:    'e.g. Washington, DC',
+      highSchoolView:       'High school',
+
+      // ── Portfolio (student) ───────────────────────────────────────────────
+      portfolioLink:        'Portfolio / Resume Link',
+      portfolioLinkSub:     'Optional. Link to your personal site, GitHub, portfolio, or a hosted resume.',
+      portfolioPlaceholder: 'https://yourname.com or github.com/yourname',
+      portfolioView:        'Portfolio / Resume',
     },
     dashboard: {
       hello:            'Hello',
@@ -453,6 +563,116 @@ const translations = {
       messageOpt:       'Mesaj (isteğe bağlı)',
       sendRequest:      'İstek Gönder',
       requestSent:      'İstek gönderildi',
+
+      // ── Profil tamamlanma durumu ──────────────────────────────────────────
+      profileCompletenessTitle: 'Profil tamamlanma durumu',
+      stillMissing:         'Eksik olan',
+      missing:              'Eksik',
+      profileCompletePrefix:'Profiliniz',
+      profileCompleteSuffix:'% tamamlandı',
+      completeItLink:       'Tamamla →',
+      profileNotFound:      'Profil bulunamadı.',
+      anonymous:            'İsimsiz',
+
+      // Tamamlanma alanı etiketleri
+      fieldPhoto:           'Profil fotoğrafı',
+      fieldBio:             'Hakkımda',
+      fieldAcademic:        'Akademik geçmiş',
+      fieldGradYear:        'Mezuniyet yılı',
+      fieldCurrentRole:     'Mevcut unvan',
+      fieldCompany:         'Şirket',
+      fieldIndustry:        'Sektör',
+      fieldCity:            'Şehir',
+      fieldLinkedIn:        'LinkedIn',
+      fieldCanHelp:         '"Yardım edilebilecek" konular',
+      fieldLookingFor:      '"Arananlar" ilgi alanları',
+      fieldCareerInterests: 'Kariyer ilgi alanları',
+      fieldHighSchoolInfo:  'Lise bilgisi',
+      fieldPortfolio:       'Portfolyo / özgeçmiş',
+
+      // ── UVA Akademik bölümü ───────────────────────────────────────────────
+      uvaAcademicSub:       "UVA'daki derece seviyenizi, okulunuzu ve programlarınızı seçin. \"Başka bölüm veya yan dal ekle\" seçeneğiyle toplamda 4'e kadar program girebilirsiniz.",
+
+      // ── Mevcut pozisyon ───────────────────────────────────────────────────
+      selectIndustry:       'Sektör seçin',
+      hometown:             'Memleket',
+      fromCity:             'Memleketi:',
+
+      // ── Kariyer geçmişi ───────────────────────────────────────────────────
+      workHistory:          'Kariyer Geçmişi',
+      workHistorySub:       'Mevcut pozisyonunuzun ötesindeki geçmiş roller. Öğrencilerin kariyer yolunuzu anlamasına yardımcı olur.',
+      addPosition:          'Pozisyon ekle',
+      addPastPosition:      'Geçmiş pozisyon ekle',
+      workRole:             'Unvan',
+      workCompany:          'Şirket',
+      workStartYear:        'Başlangıç yılı',
+      workEndYear:          'Bitiş yılı',
+      workEndYearBlank:     'güncel ise boş bırakın',
+      careerPath:           'Kariyer Yolu',
+      currentBadge:         'Güncel',
+      present:              'Günümüz',
+
+      // ── Yardım edilebilecek konular ───────────────────────────────────────
+      canHelpWithTitle:     'Nekonuda Yardımcı Olabilirsiniz?',
+      canHelpWithSub:       'Öğrencilere tavsiye verebileceğiniz konuları seçin. Profilinizde gösterilir.',
+      canHelpWithView:      'Yardım edebileceğim konular',
+
+      // ── Tavsiye / Alıntı ─────────────────────────────────────────────────
+      adviceQuote:          'Tavsiye veya Alıntı',
+      adviceQuoteSub:       'Tamamen size kalmış. Bir tavsiye, kariyer düşüncesi, yaşam felsefenizi yansıtan bir alıntı ya da size ulaşmadan önce bir öğrencinin okumasını istediğiniz herhangi bir şeyi paylaşın.',
+      adviceQuotePlaceholder: 'örn. "Kariyerinizi prestij için değil, öğrenmek için optimize edin."',
+      adviceSays:           'diyor ki',
+
+      // ── Görüşme tercihi / müsaitlik ───────────────────────────────────────
+      meetingPref:          'Görüşme tercihi',
+      meetingPrefSub:       'Öğrencilerle nasıl bağlanmayı tercih edersiniz?',
+      availabilityNote:     'Müsaitlik notu',
+      availabilityNotePlaceholder: 'örn. Genellikle bir hafta içinde yanıt veririm',
+      availabilityNoteView: 'Müsaitlik notu',
+      availVirtual:         'Yalnızca sanal',
+      availInPerson:        'Yüz yüze açığım',
+      availEither:          'Her ikisi de olur',
+
+      // ── Ortak noktalar ────────────────────────────────────────────────────
+      commonality:          'Ortak Noktalarınız',
+      commonBothStudiedAt:  'İkisi de şu okulda okudu:',
+      commonBothStudied:    'İkisi de şunu okudu:',
+      commonTargeting:      'Hedeflediğiniz sektör:',
+      commonTurkeyRoots:    "İkinizin de kökleri Türkiye'de",
+      commonBothFrom:       'Ortak memleket:',
+
+      // ── Kariyer ilgi alanları (öğrenci) ───────────────────────────────────
+      careerInterestsTitle: 'Kariyer İlgi Alanları',
+      careerInterestsSub:   'Hangi alanları veya sektörleri hedefliyorsunuz? Bu alanlardaki mezunlar ilginizi bilecek.',
+      careerInterestsView:  'Kariyer ilgi alanları',
+
+      // ── Aktiviteler (öğrenci) ─────────────────────────────────────────────
+      extracurriculars:     'Aktiviteler ve Katılım',
+      extracurricularsSub:  "UVA kulüpleri, organizasyonlar, sporlar veya diğer aktiviteler. Bir tane yazıp Enter'a basarak ekleyin.",
+      extracurricularsPlaceholder: 'örn. Türk Öğrenci Derneği',
+      addBtn:               'Ekle',
+      involvement:          'Katılım',
+
+      // ── Lise (öğrenci) ────────────────────────────────────────────────────
+      highSchool:           'Lise',
+      highSchoolSub:        'İsteğe bağlı. Mezunların ve diğer öğrencilerin ortak kökler bulmasına yardımcı olur.',
+      schoolName:           'Okul Adı',
+      schoolNamePlaceholder:"örn. Robert Kolej",
+      whereWasIt:           'Neredeydi?',
+      inTurkey:             'Türkiye',
+      outsideTurkey:        "Türkiye Dışında",
+      cityInTurkey:         "Türkiye'deki Şehir",
+      cityInTurkeyPlaceholder: 'örn. İstanbul',
+      hsCountry:            'Ülke',
+      hsCountryPlaceholder: 'örn. Amerika Birleşik Devletleri',
+      hsCityPlaceholder:    'örn. Washington, DC',
+      highSchoolView:       'Lise',
+
+      // ── Portfolyo (öğrenci) ───────────────────────────────────────────────
+      portfolioLink:        'Portfolyo / Özgeçmiş Bağlantısı',
+      portfolioLinkSub:     'İsteğe bağlı. Kişisel sitenize, GitHub\'a, portfolyonuza veya çevrimiçi özgeçmişinize bağlantı ekleyin.',
+      portfolioPlaceholder: 'https://adınız.com veya github.com/adınız',
+      portfolioView:        'Portfolyo / Özgeçmiş',
     },
     dashboard: {
       hello:            'Merhaba',

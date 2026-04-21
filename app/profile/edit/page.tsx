@@ -203,7 +203,7 @@ export default function EditProfilePage() {
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -216,25 +216,25 @@ export default function EditProfilePage() {
 
   // ── Profile completeness ───────────────────────────────────────────────────
   const completenessFields = isAlumni ? [
-    { label: 'Profile photo',        done: !!profile.avatar_url },
-    { label: 'Bio',                  done: !!(profile.bio?.trim()) },
-    { label: 'Academic background',  done: !!academicInfo.level },
-    { label: 'Graduation year',      done: !!profile.uva_graduation_year },
-    { label: 'Current role',         done: !!(profile.current_role?.trim()) },
-    { label: 'Company',              done: !!(profile.company?.trim()) },
-    { label: 'Industry',             done: !!profile.industry },
-    { label: 'City',                 done: !!(profile.city?.trim()) },
-    { label: 'LinkedIn',             done: !!(profile.linkedin_url?.trim()) },
-    { label: '"Can help with" topics', done: !!((profile.can_help_with as string[])?.length) },
+    { label: t.profile.fieldPhoto,          done: !!profile.avatar_url },
+    { label: t.profile.fieldBio,            done: !!(profile.bio?.trim()) },
+    { label: t.profile.fieldAcademic,       done: !!academicInfo.level },
+    { label: t.profile.fieldGradYear,       done: !!profile.uva_graduation_year },
+    { label: t.profile.fieldCurrentRole,    done: !!(profile.current_role?.trim()) },
+    { label: t.profile.fieldCompany,        done: !!(profile.company?.trim()) },
+    { label: t.profile.fieldIndustry,       done: !!profile.industry },
+    { label: t.profile.fieldCity,           done: !!(profile.city?.trim()) },
+    { label: t.profile.fieldLinkedIn,       done: !!(profile.linkedin_url?.trim()) },
+    { label: t.profile.fieldCanHelp,        done: !!((profile.can_help_with as string[])?.length) },
   ] : [
-    { label: 'Profile photo',           done: !!profile.avatar_url },
-    { label: 'Bio',                     done: !!(profile.bio?.trim()) },
-    { label: 'Academic background',     done: !!academicInfo.level },
-    { label: 'Graduation year',         done: !!profile.graduation_year },
-    { label: '"Looking for" interests', done: !!((profile.looking_for as string[])?.length) },
-    { label: 'Career interests',        done: !!((profile.career_interests as string[])?.length) },
-    { label: 'High school info',        done: !!(profile.high_school_name?.trim()) },
-    { label: 'Portfolio / resume',      done: !!(profile.portfolio_url?.trim()) },
+    { label: t.profile.fieldPhoto,          done: !!profile.avatar_url },
+    { label: t.profile.fieldBio,            done: !!(profile.bio?.trim()) },
+    { label: t.profile.fieldAcademic,       done: !!academicInfo.level },
+    { label: t.profile.fieldGradYear,       done: !!profile.graduation_year },
+    { label: t.profile.fieldLookingFor,     done: !!((profile.looking_for as string[])?.length) },
+    { label: t.profile.fieldCareerInterests,done: !!((profile.career_interests as string[])?.length) },
+    { label: t.profile.fieldHighSchoolInfo, done: !!(profile.high_school_name?.trim()) },
+    { label: t.profile.fieldPortfolio,      done: !!(profile.portfolio_url?.trim()) },
   ];
 
   const completedCount      = completenessFields.filter(f => f.done).length;
@@ -252,10 +252,12 @@ export default function EditProfilePage() {
         : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
     }`;
 
+  const optional = <span className="text-gray-400 font-normal">({t.profile.selectYear === 'Select year' ? 'optional' : 'isteğe bağlı'})</span>;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <div className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 pt-24 pb-16">
 
         {/* Header */}
         <div className="mb-6">
@@ -268,14 +270,14 @@ export default function EditProfilePage() {
         </div>
 
         {/* ── Profile Completeness Bar ───────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+        <div className="bg-white rounded-lg p-5 border border-[#E2D8CC] mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-900">Profile completeness</span>
+            <span className="text-sm font-semibold text-gray-900">{t.profile.profileCompletenessTitle}</span>
             <span className={`text-sm font-bold ${completenessPercent === 100 ? 'text-green-600' : 'text-primary-600'}`}>
               {completenessPercent}%
             </span>
           </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[#E2D8CC] rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${completenessPercent === 100 ? 'bg-green-500' : 'bg-primary-600'}`}
               style={{ width: `${completenessPercent}%` }}
@@ -283,7 +285,7 @@ export default function EditProfilePage() {
           </div>
           {missingFields.length > 0 && (
             <p className="text-xs text-gray-400 mt-2">
-              Still missing: {missingFields.join(', ')}
+              {t.profile.stillMissing}: {missingFields.join(', ')}
             </p>
           )}
         </div>
@@ -291,7 +293,7 @@ export default function EditProfilePage() {
         <form onSubmit={handleSave} className="space-y-6">
 
           {/* ── Profile Picture ────────────────────────────────────────────── */}
-          <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
             <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.profilePicture}</h2>
             <div className="flex items-center gap-5">
               <div className="relative flex-shrink-0">
@@ -325,7 +327,7 @@ export default function EditProfilePage() {
           </section>
 
           {/* ── Basic Info ─────────────────────────────────────────────────── */}
-          <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
             <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.basicInfo}</h2>
             <div className="space-y-4">
               <div>
@@ -342,12 +344,9 @@ export default function EditProfilePage() {
           </section>
 
           {/* ── UVA Academic Background ────────────────────────────────────── */}
-          <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="text-base font-bold text-gray-900 mb-1">UVA Academic Background</h2>
-            <p className="text-gray-400 text-xs mb-5">
-              Select your degree level, school, and program(s) at UVA.
-              Use &quot;Add another major or minor&quot; to list up to 4 total.
-            </p>
+          <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+            <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.uvaBackground}</h2>
+            <p className="text-gray-400 text-xs mb-5">{t.profile.uvaAcademicSub}</p>
             <AcademicSelector value={academicInfo} onChange={setAcademicInfo} />
           </section>
 
@@ -357,7 +356,7 @@ export default function EditProfilePage() {
           {isStudent && (
             <>
               {/* Academic details */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
                 <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.academic}</h2>
                 <div>
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.gradYear}</label>
@@ -387,11 +386,9 @@ export default function EditProfilePage() {
               </section>
 
               {/* Career interests */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Career Interests</h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  Which fields or industries are you targeting? Alumni in these areas will know you&apos;re interested.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.careerInterestsTitle}</h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.careerInterestsSub}</p>
                 <div className="flex flex-wrap gap-2">
                   {CAREER_INTEREST_OPTIONS.map(opt => {
                     const selected = ((profile.career_interests as string[]) || []).includes(opt);
@@ -406,23 +403,21 @@ export default function EditProfilePage() {
               </section>
 
               {/* Extracurriculars */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Extracurriculars & Involvement</h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  UVA clubs, organizations, sports, or any other activities. Type one and press Enter to add.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.extracurriculars}</h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.extracurricularsSub}</p>
                 <div className="flex gap-2 mb-3">
                   <input
                     type="text"
                     value={extraInput}
                     onChange={e => setExtraInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addExtracurricular(); } }}
-                    placeholder="e.g. Turkish Student Association"
+                    placeholder={t.profile.extracurricularsPlaceholder}
                     className={inputClass + ' flex-1'}
                   />
                   <button type="button" onClick={addExtracurricular}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5">
-                    <Plus size={14} /> Add
+                    <Plus size={14} /> {t.profile.addBtn}
                   </button>
                 </div>
                 {((profile.extracurriculars as string[]) || []).length > 0 && (
@@ -442,23 +437,21 @@ export default function EditProfilePage() {
               </section>
 
               {/* High school */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">High School</h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  Optional. Helps alumni and fellow students find shared roots.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.highSchool}</h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.highSchoolSub}</p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">School Name</label>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.schoolName}</label>
                     <input type="text" value={profile.high_school_name || ''}
                       onChange={e => update('high_school_name', e.target.value)}
-                      className={inputClass} placeholder="e.g. Robert College" />
+                      className={inputClass} placeholder={t.profile.schoolNamePlaceholder} />
                   </div>
 
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Where was it?</label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">{t.profile.whereWasIt}</label>
                     <div className="flex gap-2">
-                      {['Turkey', 'Other'].map(c => (
+                      {(['Turkey', 'Other'] as const).map(c => (
                         <button key={c} type="button"
                           onClick={() => { update('high_school_country', c); if (c === 'Turkey') update('high_school_other_country', ''); }}
                           className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
@@ -466,7 +459,7 @@ export default function EditProfilePage() {
                               ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
                           }`}>
-                          {c === 'Turkey' ? 'Turkey' : 'Outside Turkey'}
+                          {c === 'Turkey' ? t.profile.inTurkey : t.profile.outsideTurkey}
                         </button>
                       ))}
                     </div>
@@ -474,26 +467,26 @@ export default function EditProfilePage() {
 
                   {profile.high_school_country === 'Turkey' && (
                     <div>
-                      <label className="block mb-1.5 text-sm font-medium text-gray-700">City in Turkey</label>
+                      <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.cityInTurkey}</label>
                       <input type="text" value={profile.high_school_city || ''}
                         onChange={e => update('high_school_city', e.target.value)}
-                        className={inputClass} placeholder="e.g. Istanbul" />
+                        className={inputClass} placeholder={t.profile.cityInTurkeyPlaceholder} />
                     </div>
                   )}
 
                   {profile.high_school_country === 'Other' && (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block mb-1.5 text-sm font-medium text-gray-700">Country</label>
+                        <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.hsCountry}</label>
                         <input type="text" value={profile.high_school_other_country || ''}
                           onChange={e => update('high_school_other_country', e.target.value)}
-                          className={inputClass} placeholder="e.g. United States" />
+                          className={inputClass} placeholder={t.profile.hsCountryPlaceholder} />
                       </div>
                       <div>
-                        <label className="block mb-1.5 text-sm font-medium text-gray-700">City</label>
+                        <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.city}</label>
                         <input type="text" value={profile.high_school_city || ''}
                           onChange={e => update('high_school_city', e.target.value)}
-                          className={inputClass} placeholder="e.g. Washington, DC" />
+                          className={inputClass} placeholder={t.profile.hsCityPlaceholder} />
                       </div>
                     </div>
                   )}
@@ -501,14 +494,12 @@ export default function EditProfilePage() {
               </section>
 
               {/* Portfolio / resume link */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Portfolio / Resume Link</h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  Optional. Link to your personal site, GitHub, portfolio, or a hosted resume.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.portfolioLink}</h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.portfolioLinkSub}</p>
                 <input type="url" value={profile.portfolio_url || ''}
                   onChange={e => update('portfolio_url', e.target.value)}
-                  className={inputClass} placeholder="https://yourname.com or github.com/yourname" />
+                  className={inputClass} placeholder={t.profile.portfolioPlaceholder} />
               </section>
             </>
           )}
@@ -519,7 +510,7 @@ export default function EditProfilePage() {
           {isAlumni && (
             <>
               {/* UVA Graduation Year */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
                 <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.uvaBackground}</h2>
                 <div>
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.uvaGradYear}</label>
@@ -532,7 +523,7 @@ export default function EditProfilePage() {
               </section>
 
               {/* Current position */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
                 <h2 className="text-base font-bold text-gray-900 mb-5">{t.profile.currentPos}</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
@@ -548,7 +539,7 @@ export default function EditProfilePage() {
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.industry}</label>
                     <select value={profile.industry || ''} onChange={e => update('industry', e.target.value)} className={selectClass}>
-                      <option value="">Select industry</option>
+                      <option value="">{t.profile.selectIndustry}</option>
                       {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
                     </select>
                   </div>
@@ -558,7 +549,9 @@ export default function EditProfilePage() {
                       className={inputClass} placeholder="e.g. New York, NY" />
                   </div>
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Hometown <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      {t.profile.hometown} {optional}
+                    </label>
                     <input type="text" value={profile.hometown || ''} onChange={e => update('hometown', e.target.value)}
                       className={inputClass} placeholder="e.g. Istanbul" />
                   </div>
@@ -568,7 +561,9 @@ export default function EditProfilePage() {
                       className={inputClass} placeholder="https://linkedin.com/in/yourname" />
                   </div>
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">{t.profile.phone} <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      {t.profile.phone} {optional}
+                    </label>
                     <input type="tel" value={profile.phone_number || ''} onChange={e => update('phone_number', e.target.value)}
                       className={inputClass} placeholder={t.profile.phonePlaceholder} />
                   </div>
@@ -576,55 +571,57 @@ export default function EditProfilePage() {
               </section>
 
               {/* Work history */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
                 <div className="flex items-center justify-between mb-1">
-                  <h2 className="text-base font-bold text-gray-900">Work History <span className="text-gray-400 font-normal text-sm">(optional)</span></h2>
+                  <h2 className="text-base font-bold text-gray-900">
+                    {t.profile.workHistory} {optional}
+                  </h2>
                   {workHistory.length < 4 && (
                     <button type="button" onClick={addWorkEntry}
                       className="flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
-                      <Plus size={14} /> Add position
+                      <Plus size={14} /> {t.profile.addPosition}
                     </button>
                   )}
                 </div>
-                <p className="text-gray-400 text-xs mb-4">
-                  Past roles beyond your current position. Helps students understand your career path.
-                </p>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.workHistorySub}</p>
 
                 {workHistory.length === 0 ? (
                   <button type="button" onClick={addWorkEntry}
-                    className="w-full py-8 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm hover:border-primary-300 hover:text-primary-500 transition-colors">
+                    className="w-full py-8 border-2 border-dashed border-[#E2D8CC] rounded-xl text-gray-400 text-sm hover:border-[#C4001A] hover:text-[#C4001A] transition-colors">
                     <Plus size={16} className="mx-auto mb-1" />
-                    Add a past position
+                    {t.profile.addPastPosition}
                   </button>
                 ) : (
                   <div className="space-y-4">
                     {workHistory.map((entry, i) => (
-                      <div key={i} className="bg-gray-50 rounded-xl p-4 relative">
+                      <div key={i} className="bg-[#F4EFE6] rounded-lg p-4 relative">
                         <button type="button" onClick={() => removeWorkEntry(i)}
                           className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors">
                           <Trash2 size={14} />
                         </button>
                         <div className="grid sm:grid-cols-2 gap-3 pr-6">
                           <div>
-                            <label className="block mb-1 text-xs font-medium text-gray-600">Role</label>
+                            <label className="block mb-1 text-xs font-medium text-gray-600">{t.profile.workRole}</label>
                             <input type="text" value={entry.role}
                               onChange={e => updateWorkEntry(i, 'role', e.target.value)}
                               className={inputClass} placeholder="e.g. Analyst" />
                           </div>
                           <div>
-                            <label className="block mb-1 text-xs font-medium text-gray-600">Company</label>
+                            <label className="block mb-1 text-xs font-medium text-gray-600">{t.profile.workCompany}</label>
                             <input type="text" value={entry.company}
                               onChange={e => updateWorkEntry(i, 'company', e.target.value)}
                               className={inputClass} placeholder="e.g. McKinsey" />
                           </div>
                           <div>
-                            <label className="block mb-1 text-xs font-medium text-gray-600">Start year</label>
+                            <label className="block mb-1 text-xs font-medium text-gray-600">{t.profile.workStartYear}</label>
                             <input type="number" value={entry.start_year} min={1970} max={new Date().getFullYear()}
                               onChange={e => updateWorkEntry(i, 'start_year', e.target.value)}
                               className={inputClass} placeholder="e.g. 2018" />
                           </div>
                           <div>
-                            <label className="block mb-1 text-xs font-medium text-gray-600">End year <span className="text-gray-400">(leave blank if current)</span></label>
+                            <label className="block mb-1 text-xs font-medium text-gray-600">
+                              {t.profile.workEndYear} <span className="text-gray-400">({t.profile.workEndYearBlank})</span>
+                            </label>
                             <input type="number" value={entry.end_year} min={1970} max={new Date().getFullYear()}
                               onChange={e => updateWorkEntry(i, 'end_year', e.target.value)}
                               className={inputClass} placeholder="e.g. 2021" />
@@ -637,11 +634,11 @@ export default function EditProfilePage() {
               </section>
 
               {/* Can help with */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">What Can You Help With? <span className="text-gray-400 font-normal text-sm">(optional)</span></h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  Select the topics you&apos;re comfortable advising students on. This shows on your profile.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">
+                  {t.profile.canHelpWithTitle} {optional}
+                </h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.canHelpWithSub}</p>
                 <div className="flex flex-wrap gap-2">
                   {CAN_HELP_WITH_OPTIONS.map(opt => {
                     const selected = ((profile.can_help_with as string[]) || []).includes(opt);
@@ -656,19 +653,18 @@ export default function EditProfilePage() {
               </section>
 
               {/* Advice snippet */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Advice or Quote <span className="text-gray-400 font-normal text-sm">(optional)</span></h2>
-                <p className="text-gray-400 text-xs mb-4">
-                  Entirely up to you. Share a piece of advice, a career reflection, a quote you live by, or
-                  anything else you&apos;d want a student to read before reaching out. This is shown prominently on your profile.
-                </p>
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
+                <h2 className="text-base font-bold text-gray-900 mb-1">
+                  {t.profile.adviceQuote} {optional}
+                </h2>
+                <p className="text-gray-400 text-xs mb-4">{t.profile.adviceQuoteSub}</p>
                 <textarea
                   value={profile.advice_snippet || ''}
                   onChange={e => update('advice_snippet', e.target.value)}
                   rows={4}
                   maxLength={300}
                   className={inputClass + ' resize-none'}
-                  placeholder="e.g. &quot;Don't optimize your career for prestige — optimize it for learning.&quot;"
+                  placeholder={t.profile.adviceQuotePlaceholder}
                 />
                 <p className="text-right text-xs text-gray-400 mt-1">
                   {(profile.advice_snippet || '').length} / 300
@@ -676,7 +672,7 @@ export default function EditProfilePage() {
               </section>
 
               {/* Privacy & availability */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-lg p-6 border border-[#E2D8CC]">
                 <h2 className="text-base font-bold text-gray-900 mb-1">{t.profile.privacy}</h2>
                 <p className="text-gray-500 text-sm mb-5">{t.profile.privacySub}</p>
                 <div className="space-y-5">
@@ -703,30 +699,39 @@ export default function EditProfilePage() {
                 </div>
 
                 {/* Availability preference */}
-                <div className="mt-6 pt-5 border-t border-gray-100">
-                  <p className="text-sm font-semibold text-gray-900 mb-1">Meeting preference <span className="text-gray-400 font-normal">(optional)</span></p>
-                  <p className="text-xs text-gray-400 mb-3">How do you prefer to connect with students?</p>
+                <div className="mt-6 pt-5 border-t border-[#E2D8CC]">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">
+                    {t.profile.meetingPref} {optional}
+                  </p>
+                  <p className="text-xs text-gray-400 mb-3">{t.profile.meetingPrefSub}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {AVAILABILITY_OPTIONS.map(opt => (
-                      <button key={opt.value} type="button"
-                        onClick={() => update('availability_preference',
-                          profile.availability_preference === opt.value ? null : opt.value
-                        )}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
-                          profile.availability_preference === opt.value
-                            ? 'bg-primary-600 text-white border-primary-600'
-                            : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
-                        }`}>
-                        {opt.label}
-                      </button>
-                    ))}
+                    {AVAILABILITY_OPTIONS.map(opt => {
+                      const label = opt.value === 'virtual'
+                        ? t.profile.availVirtual
+                        : opt.value === 'in_person'
+                        ? t.profile.availInPerson
+                        : t.profile.availEither;
+                      return (
+                        <button key={opt.value} type="button"
+                          onClick={() => update('availability_preference',
+                            profile.availability_preference === opt.value ? null : opt.value
+                          )}
+                          className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                            profile.availability_preference === opt.value
+                              ? 'bg-primary-600 text-white border-primary-600'
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                          }`}>
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                    Availability note <span className="text-gray-400 font-normal">(optional)</span>
+                    {t.profile.availabilityNote} {optional}
                   </label>
                   <input type="text" value={profile.availability_note || ''}
                     onChange={e => update('availability_note', e.target.value)}
-                    className={inputClass} placeholder="e.g. I usually respond within a week" maxLength={120} />
+                    className={inputClass} placeholder={t.profile.availabilityNotePlaceholder} maxLength={120} />
                 </div>
               </section>
             </>

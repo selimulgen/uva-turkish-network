@@ -159,7 +159,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section id="how-it-works" className="py-24 bg-white">
+      <section id="how-it-works" className="py-24 bg-[#F4EFE6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="ornament-divider max-w-xs mx-auto mb-4">
@@ -174,39 +174,56 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                icon: <Users size={26} className="text-primary-600" />,
+                num: '01',
+                iconBg: 'bg-rose-50',
+                icon: <Users size={22} className="text-[#C4001A]" />,
                 title: t.landing.card1Title,
                 subtitle: t.landing.card1Sub,
+                subtitleColor: 'text-[#C4001A]',
                 points: [t.landing.card1p1, t.landing.card1p2, t.landing.card1p3, t.landing.card1p4],
-                accent: 'border-primary-100',
               },
               {
-                icon: <Briefcase size={26} className="text-uva-navy" />,
+                num: '02',
+                iconBg: 'bg-slate-100',
+                icon: <Briefcase size={22} className="text-[#1E2D5A]" />,
                 title: t.landing.card2Title,
                 subtitle: t.landing.card2Sub,
+                subtitleColor: 'text-gray-700',
                 points: [t.landing.card2p1, t.landing.card2p2, t.landing.card2p3, t.landing.card2p4],
-                accent: 'border-blue-100',
               },
               {
-                icon: <Shield size={26} className="text-uva-orange" />,
+                num: '03',
+                iconBg: 'bg-amber-50',
+                icon: <Shield size={22} className="text-[#E57200]" />,
                 title: t.landing.card3Title,
                 subtitle: t.landing.card3Sub,
+                subtitleColor: 'text-[#E57200]',
                 points: [t.landing.card3p1, t.landing.card3p2, t.landing.card3p3, t.landing.card3p4],
-                accent: 'border-orange-100',
               },
             ].map((card, i) => (
-              <div key={i} className={`bg-white rounded-2xl p-8 border-2 ${card.accent} card-hover shadow-sm`}>
-                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mb-5 shadow-sm">
+              <div key={i} className="relative bg-white rounded-xl p-8 border border-[#E2D8CC] overflow-hidden transition-all duration-200 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/8 cursor-default">
+                {/* Ghost number watermark */}
+                <span
+                  className="absolute top-4 right-6 text-8xl font-bold leading-none select-none pointer-events-none"
+                  style={{ fontFamily: 'var(--font-playfair)', color: '#E2D8CC' }}
+                >
+                  {card.num}
+                </span>
+
+                {/* Icon */}
+                <div className={`relative z-10 w-10 h-10 ${card.iconBg} rounded-xl flex items-center justify-center mb-6`}>
                   {card.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1" style={{ fontFamily: 'var(--font-playfair)' }}>
+
+                <h3 className="relative z-10 text-xl font-bold text-gray-900 mb-1" style={{ fontFamily: 'var(--font-playfair)' }}>
                   {card.title}
                 </h3>
-                <p className="text-primary-600 text-sm font-semibold mb-4">{card.subtitle}</p>
-                <ul className="space-y-2">
+                <p className={`relative z-10 text-sm font-semibold mb-5 ${card.subtitleColor}`}>{card.subtitle}</p>
+
+                <ul className="relative z-10 space-y-2.5">
                   {card.points.map((pt, j) => (
-                    <li key={j} className="flex items-start gap-2 text-gray-500 text-sm">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary-400 flex-shrink-0" />
+                    <li key={j} className="flex items-start gap-2.5 text-gray-500 text-sm">
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[#E2D8CC] flex-shrink-0" />
                       {pt}
                     </li>
                   ))}
@@ -218,7 +235,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Public Job Board ── */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-[#F4EFE6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
@@ -242,7 +259,7 @@ export default function LandingPage() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {jobs.map(job => (
-                <div key={job.id} className="bg-white rounded-2xl p-6 border border-gray-100 card-hover shadow-sm">
+                <div key={job.id} className="bg-white rounded-lg p-6 border border-[#E2D8CC] card-hover">
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                       <Building2 size={18} className="text-gray-400" />

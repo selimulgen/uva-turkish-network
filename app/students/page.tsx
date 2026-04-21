@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { createClient } from '@/lib/supabase/client';
+import { getAuthUserId } from '@/lib/supabase/getAuthUserId';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile } from '@/lib/types';
 import { LOOKING_FOR_OPTIONS, getInitials } from '@/lib/utils';
@@ -25,11 +26,11 @@ export default function StudentsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login'); return; }
+      const userId = await getAuthUserId();
+      if (!userId) { router.push('/auth/login'); return; }
 
       const [meRes, studentsRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('profiles').select('*').eq('id', userId).single(),
         supabase
           .from('profiles')
           .select('*')
@@ -88,7 +89,7 @@ export default function StudentsPage() {
   const hasFilters = search || yearFilter;
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -97,11 +98,11 @@ export default function StudentsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
 
       {/* Hero */}
-      <div className="bg-white border-b border-gray-100 pt-24 pb-10">
+      <div className="bg-white border-b border-[#E2D8CC] pt-24 pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">{t.students.eyebrow}</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-playfair)' }}>
@@ -175,7 +176,7 @@ export default function StudentsPage() {
                 <Link
                   key={student.id}
                   href={`/profile/${student.id}`}
-                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all p-5 flex flex-col gap-4"
+                  className="group bg-white rounded-lg border border-[#E2D8CC] hover:shadow-md hover:border-[#C4001A] transition-all p-5 flex flex-col gap-4"
                 >
                   {/* Top row: avatar + name + year */}
                   <div className="flex items-start gap-3">
@@ -242,7 +243,7 @@ export default function StudentsPage() {
                   )}
 
                   {/* Email */}
-                  <div className="pt-1 border-t border-gray-50">
+                  <div className="pt-1 border-t border-[#E2D8CC]">
                     <a
                       href={`mailto:${student.email}`}
                       onClick={e => e.stopPropagation()}

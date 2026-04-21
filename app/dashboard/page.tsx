@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { createClient } from '@/lib/supabase/client';
+import { getAuthUserId } from '@/lib/supabase/getAuthUserId';
 import { useLanguage } from '@/lib/language-context';
 import type { Profile, Job, NetworkRequest } from '@/lib/types';
 import { JOB_TYPE_LABELS, JOB_TYPE_COLORS, formatRelativeDate, getInitials } from '@/lib/utils';
@@ -26,16 +27,16 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login'); return; }
+      const userId = await getAuthUserId();
+      if (!userId) { router.push('/auth/login'); return; }
 
       const [profileRes, jobsRes, reqRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('profiles').select('*').eq('id', userId).single(),
         supabase.from('jobs').select('*, profiles(full_name)').eq('is_active', true)
           .order('created_at', { ascending: false }).limit(3),
         supabase.from('requests')
           .select('*, from_profile:profiles!from_user(*), to_profile:profiles!to_user(*)')
-          .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
+          .or(`from_user.eq.${userId},to_user.eq.${userId}`)
           .order('created_at', { ascending: false }).limit(5),
       ]);
 
@@ -60,7 +61,7 @@ export default function DashboardPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
         <span className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
@@ -71,15 +72,15 @@ export default function DashboardPage() {
   const isAlumni = profile?.role === 'alumni';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4EFE6] flex flex-col">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-24 pb-16">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-playfair)' }}>
-              {t.dashboard.hello}, {profile?.full_name?.split(' ')[0] || ''} 👋
+              {t.dashboard.hello}, {profile?.full_name?.split(' ')[0] || ''}
             </h1>
             <p className="text-gray-500 text-sm mt-1 capitalize">{profile?.role} · UVA Turkish Network</p>
           </div>
@@ -90,20 +91,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+        <div className="flex flex-wrap gap-2 mb-10">
           {[
-            { icon: <Users size={20} />,       label: t.dashboard.alumniDir,    href: '/directory', show: true },
-            { icon: <Briefcase size={20} />,   label: t.dashboard.opportunities, href: '/jobs',       show: true },
-            { icon: <Coffee size={20} />,      label: t.dashboard.requests,     href: '/requests',   show: true },
-            { icon: <MessageCircle size={20} />,label: t.dashboard.messages,    href: '/messages',   show: isAlumni },
-            { icon: <Plus size={20} />,        label: t.dashboard.postOpp,      href: '/jobs/new',   show: isAlumni },
-          ].filter(a => a.show).slice(0, 4).map(action => (
+            { icon: <Users size={16} />,         label: t.dashboard.alumniDir,     href: '/directory', show: true },
+            { icon: <Briefcase size={16} />,     label: t.dashboard.opportunities, href: '/jobs',      show: true },
+            { icon: <Coffee size={16} />,        label: t.dashboard.requests,      href: '/requests',  show: true },
+            { icon: <MessageCircle size={16} />, label: t.dashboard.messages,      href: '/messages',  show: true },
+            { icon: <Plus size={16} />,          label: t.dashboard.postOpp,       href: '/jobs/new',  show: isAlumni },
+          ].filter(a => a.show).map(action => (
             <Link key={action.href} href={action.href}
-              className="flex flex-col items-center gap-2 bg-white border border-gray-100 rounded-2xl p-5 hover:border-primary-200 hover:shadow-md transition-all group card-hover shadow-sm">
-              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-500 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                {action.icon}
-              </div>
-              <span className="text-xs font-semibold text-gray-700 text-center leading-tight">{action.label}</span>
+              className="inline-flex items-center gap-2 bg-white border border-[#E2D8CC] rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#C4001A] hover:text-[#C4001A] transition-colors">
+              {action.icon}
+              {action.label}
             </Link>
           ))}
         </div>
@@ -113,7 +112,7 @@ export default function DashboardPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-5">
             {/* Profile card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-white rounded-lg border border-[#E2D8CC] p-5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-xl bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
                   {getInitials(profile?.full_name || profile?.email || 'U')}
@@ -145,7 +144,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Requests */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-white rounded-lg border border-[#E2D8CC] p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-gray-900">{t.dashboard.recentRequests}</h3>
                 <Link href="/requests" className="text-xs text-primary-600 hover:text-primary-700">{t.dashboard.viewAll}</Link>
@@ -176,7 +175,7 @@ export default function DashboardPage() {
 
           {/* Jobs */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-white rounded-lg border border-[#E2D8CC] p-5">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: 'var(--font-playfair)' }}>
                   {t.dashboard.latestOpps}
@@ -207,8 +206,8 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-3">
                   {recentJobs.map(job => (
-                    <div key={job.id} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-primary-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <div key={job.id} className="flex items-start gap-4 p-4 rounded-xl bg-[#F4EFE6] border border-[#E2D8CC] hover:border-[#C4001A] transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#E2D8CC] flex items-center justify-center flex-shrink-0">
                         <Building2 size={16} className="text-gray-400" />
                       </div>
                       <div className="flex-1 min-w-0">

@@ -18,12 +18,12 @@ const config: Config = {
           200:     '#ffc6c6',
           300:     '#ff9e9e',
           400:     '#ff6565',
-          500:     '#f83535',
-          600:     '#e30a17',  // Turkish flag red
-          700:     '#c00614',
-          800:     '#9f0715',
-          900:     '#850b17',
-          DEFAULT: '#E30A17',
+          500:     '#e8273a',
+          600:     '#C4001A',
+          700:     '#a3001a',
+          800:     '#84001a',
+          900:     '#6b001a',
+          DEFAULT: '#C4001A',
         },
         // UVA Navy — secondary accent
         navy: {
@@ -42,9 +42,12 @@ const config: Config = {
         uva: {
           navy:   '#1E2D5A',   // UVA navy — used for footer, secondary UI
           orange: '#E57200',   // UVA orange — used for badges, UVA-specific accents
-          cream:  '#F7F3EE',   // warm off-white backgrounds
-          sand:   '#E8E0D5',   // borders and dividers
+          cream:  '#F4EFE6',   // warm parchment backgrounds
+          sand:   '#E2D8CC',   // borders and dividers
         },
+        cream: '#F4EFE6',
+        sand:  '#E2D8CC',
+        ink:   '#1C1714',
       },
       fontFamily: {
         playfair: ['var(--font-playfair)', 'Georgia', 'serif'],
