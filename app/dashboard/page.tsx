@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const [requests, setRequests]     = useState<NetworkRequest[]>([]);
   const [loading, setLoading]       = useState(true);
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
@@ -48,7 +48,8 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useVisibilityRefetch(fetchData);
 

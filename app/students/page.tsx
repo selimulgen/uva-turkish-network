@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ export default function StudentsPage() {
   const [yearFilter, setYearFilter] = useState('');
 
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
@@ -43,7 +43,8 @@ export default function StudentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useVisibilityRefetch(fetchData);
 

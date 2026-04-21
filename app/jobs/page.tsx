@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -23,7 +23,7 @@ export default function JobsPage() {
   const [filterType, setFilterType]   = useState('');
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
@@ -44,7 +44,8 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useVisibilityRefetch(fetchData);
 

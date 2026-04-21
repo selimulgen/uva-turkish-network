@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -17,7 +17,7 @@ import {
 export default function ProfilePage() {
   const params   = useParams();
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const [profile, setProfile]         = useState<Profile | null>(null);
@@ -61,7 +61,8 @@ export default function ProfilePage() {
       if (req) setExistingReq(req.id);
     }
     setLoading(false);
-  }, [supabase, profileId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

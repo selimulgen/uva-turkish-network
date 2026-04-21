@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -24,7 +24,7 @@ export default function NewJobPage() {
   const [appUrl, setAppUrl]         = useState('');
 
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchProfile = useCallback(async () => {
@@ -39,7 +39,8 @@ export default function NewJobPage() {
     setProfile(data as Profile);
     setCompany(data.company || '');
     setLoading(false);
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 

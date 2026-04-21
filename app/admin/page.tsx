@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function AdminPage() {
   const [stats, setStats]   = useState({ total: 0, students: 0, alumni: 0, jobs: 0 });
 
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchData = useCallback(async () => {
@@ -53,7 +53,8 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useVisibilityRefetch(fetchData);
 

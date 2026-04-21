@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ export default function RequestsPage() {
   const [tab, setTab]           = useState<'incoming' | 'outgoing'>('incoming');
 
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const STATUS_CONFIG = {
@@ -46,7 +46,8 @@ export default function RequestsPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useVisibilityRefetch(fetchData);
 

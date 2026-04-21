@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useVisibilityRefetch } from '@/lib/hooks/useVisibilityRefetch';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
@@ -65,7 +65,7 @@ export default function EditProfilePage() {
   const fileInputRef                          = useRef<HTMLInputElement>(null);
 
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { t }    = useLanguage();
 
   const fetchProfile = useCallback(async () => {
@@ -86,7 +86,8 @@ export default function EditProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   useVisibilityRefetch(fetchProfile);
 
