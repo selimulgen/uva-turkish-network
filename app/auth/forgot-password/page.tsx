@@ -2,17 +2,23 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import { useLanguage } from '@/lib/language-context';
 import { AlertCircle, ArrowLeft, Mail } from 'lucide-react';
+
+// Use implicit flow so the reset link works when opened on a different
+// device or browser (PKCE requires the same browser that made the request).
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  { auth: { flowType: 'implicit' } }
+);
 
 export default function ForgotPasswordPage() {
   const [email, setEmail]     = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
   const [sent, setSent]       = useState(false);
-
-  const supabase = createClient();
   const { t }    = useLanguage();
 
   const inputClass = "w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors text-sm";
@@ -22,7 +28,7 @@ export default function ForgotPasswordPage() {
     setError('');
     setLoading(true);
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/auth/reset-password`;
+    const redirectTo = `${window.location.origin}/auth/reset-password`;
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
 
     if (err) {

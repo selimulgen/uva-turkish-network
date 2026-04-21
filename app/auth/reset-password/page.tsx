@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import { useLanguage } from '@/lib/language-context';
 import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+
+// Implicit flow client to match the forgot-password page
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  { auth: { flowType: 'implicit' } }
+);
 
 export default function ResetPasswordPage() {
   const [password, setPassword]               = useState('');
@@ -15,10 +22,20 @@ export default function ResetPasswordPage() {
   const [loading, setLoading]                 = useState(false);
   const [error, setError]                     = useState('');
   const [success, setSuccess]                 = useState(false);
+  const [ready, setReady]                     = useState(false);
 
-  const router   = useRouter();
-  const supabase = createClient();
-  const { t }    = useLanguage();
+  const router = useRouter();
+  const { t }  = useLanguage();
+
+  useEffect(() => {
+    // With implicit flow, Supabase puts the recovery token in the URL hash.
+    // onAuthStateChange fires PASSWORD_RECOVERY when it detects that hash,
+    // which works in any browser regardless of where the request originated.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') setReady(true);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const inputClass = "w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors text-sm";
 
@@ -48,6 +65,21 @@ export default function ResetPasswordPage() {
     setSuccess(true);
     setTimeout(() => router.push('/dashboard'), 2000);
   };
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center">
+          <span className="w-8 h-8 border-2 border-primary-600/30 border-t-primary-600 rounded-full animate-spin inline-block mb-4" />
+          <p className="text-gray-500 text-sm">Verifying reset link...</p>
+          <p className="text-gray-400 text-xs mt-2">
+            Link not working?{' '}
+            <Link href="/auth/forgot-password" className="text-primary-600 hover:underline">Request a new one</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
