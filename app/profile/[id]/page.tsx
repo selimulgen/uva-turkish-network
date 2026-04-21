@@ -184,13 +184,13 @@ export default function ProfilePage() {
   const extracurriculars = (profile.extracurriculars as string[]) || [];
   const availabilityLabel = AVAILABILITY_OPTIONS.find(o => o.value === profile.availability_preference)?.label;
 
-  function highSchoolLocation(): string {
-    if (!profile.high_school_country) return '';
-    if (profile.high_school_country === 'Turkey') {
-      return profile.high_school_city ? `${profile.high_school_city}, Turkey` : 'Turkey';
+  function highSchoolLocation(p: Profile): string {
+    if (!p.high_school_country) return '';
+    if (p.high_school_country === 'Turkey') {
+      return p.high_school_city ? `${p.high_school_city}, Turkey` : 'Turkey';
     }
-    const country = profile.high_school_other_country || 'International';
-    return profile.high_school_city ? `${profile.high_school_city}, ${country}` : country;
+    const country = p.high_school_other_country || 'International';
+    return p.high_school_city ? `${p.high_school_city}, ${country}` : country;
   }
 
   return (
@@ -549,9 +549,9 @@ export default function ProfilePage() {
                   <School size={12} /> High school
                 </h3>
                 <p className="text-sm font-semibold text-gray-900">{profile.high_school_name}</p>
-                {highSchoolLocation() && (
+                {highSchoolLocation(profile) && (
                   <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                    <MapPin size={10} /> {highSchoolLocation()}
+                    <MapPin size={10} /> {highSchoolLocation(profile)}
                   </p>
                 )}
               </div>
