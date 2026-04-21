@@ -11,6 +11,11 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // For password reset flow, skip profile check and go straight to reset page
+      if (next === '/auth/reset-password') {
+        return NextResponse.redirect(`${origin}/auth/reset-password`);
+      }
+
       // Check if profile is completed; redirect to edit if not
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {

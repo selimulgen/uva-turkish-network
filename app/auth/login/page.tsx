@@ -91,7 +91,7 @@ function LoginForm() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="password">{t.auth.password}</label>
-                <Link href="#" className="text-xs text-primary-600 hover:text-primary-700">{t.auth.forgotPassword}</Link>
+                <Link href="/auth/forgot-password" className="text-xs text-primary-600 hover:text-primary-700">{t.auth.forgotPassword}</Link>
               </div>
               <div className="relative">
                 <input id="password" type={showPw ? 'text' : 'password'} value={password}

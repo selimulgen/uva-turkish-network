@@ -32,7 +32,7 @@ h1, h2, h3 {
 
 /* Turkish star pattern (white on red for hero sections) */
 .turkish-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 0 L46 28 L80 40 L46 52 L40 80 L34 52 L0 40 L34 28 Z' fill='rgba(255%2C255%2C255%2C0.07)'/%3E%3Ccircle cx='40' cy='40' r='14' fill='none' stroke='rgba(255%2C255%2C255%2C0.05)' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 4 L34 22 L60 30 L34 38 L30 56 L26 38 L0 30 L26 22 Z' fill='rgba(255%2C255%2C255%2C0.13)'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='rgba(255%2C255%2C255%2C0.09)' stroke-width='1'/%3E%3Cpath d='M30 18 L31.5 25 L30 32 L28.5 25 Z' fill='rgba(255%2C255%2C255%2C0.06)'/%3E%3C/svg%3E");
 }
 
 /* Ornament divider */

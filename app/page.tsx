@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/lib/language-context';
 import Navbar from '@/components/layout/Navbar';
@@ -11,9 +11,35 @@ import type { Job } from '@/lib/types';
 import { JOB_TYPE_LABELS, JOB_TYPE_COLORS, formatRelativeDate } from '@/lib/utils';
 import { Users, Briefcase, Coffee, Star, ArrowRight, MapPin, Building2, Shield } from 'lucide-react';
 
+function useCountUp(target: number, duration = 1400, trigger = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!trigger || target === 0) return;
+    let startTime: number | null = null;
+    const step = (now: number) => {
+      if (!startTime) startTime = now;
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration, trigger]);
+  return count;
+}
+
 export default function LandingPage() {
   const { t } = useLanguage();
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [stats, setStats] = useState({ alumni: 0, students: 0, jobs: 0 });
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  const alumniCount   = useCountUp(stats.alumni,   1400, statsVisible);
+  const studentCount  = useCountUp(stats.students, 1400, statsVisible);
+  const jobsCount     = useCountUp(stats.jobs,     1400, statsVisible);
 
   useEffect(() => {
     const supabase = createClient();
@@ -24,6 +50,22 @@ export default function LandingPage() {
       .order('created_at', { ascending: false })
       .limit(6)
       .then(({ data }) => setJobs((data as unknown as Job[]) || []));
+
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => setStats(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setStatsVisible(true); },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -42,7 +84,7 @@ export default function LandingPage() {
             style={{ background: 'radial-gradient(circle, transparent 30%, rgba(196,10,23,0.4) 60%, #C0081A 80%)' }}
           />
           <Image
-            src="/tsa_logo.jpg"
+            src="/tsa_logo.png"
             alt=""
             fill
             className="object-contain opacity-[0.18] mix-blend-luminosity"
@@ -58,7 +100,7 @@ export default function LandingPage() {
             {/* Eyebrow with the actual logo */}
             <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
               <Image
-                src="/tsa_logo.jpg"
+                src="/tsa_logo.png"
                 alt="TSA at UVA"
                 width={28}
                 height={28}
@@ -94,11 +136,11 @@ export default function LandingPage() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8 mt-14 pt-10 border-t border-white/15">
+            <div ref={statsRef} className="flex flex-wrap gap-8 mt-14 pt-10 border-t border-white/15">
               {[
-                { label: t.landing.stat1, value: '50+' },
-                { label: t.landing.stat2, value: '80+' },
-                { label: t.landing.stat3, value: '30+' },
+                { label: t.landing.stat1, value: alumniCount },
+                { label: t.landing.stat2, value: studentCount },
+                { label: t.landing.stat3, value: jobsCount },
               ].map(stat => (
                 <div key={stat.label}>
                   <p className="text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-playfair)' }}>{stat.value}</p>
@@ -111,7 +153,7 @@ export default function LandingPage() {
 
         {/* UVA badge — bottom right */}
         <div className="absolute bottom-8 right-8 flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
-          <Image src="/tsa_logo.jpg" alt="" width={16} height={16} className="opacity-80" />
+          <Image src="/tsa_logo.png" alt="" width={16} height={16} className="opacity-80" />
           <span className="text-white/60 text-xs">University of Virginia</span>
         </div>
       </section>

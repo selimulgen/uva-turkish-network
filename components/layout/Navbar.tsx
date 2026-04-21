@@ -86,7 +86,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <Image
-              src="/tsa_logo.jpg"
+              src="/tsa_logo.png"
               alt="Turkish Student Association at UVA"
               width={36}
               height={36}
