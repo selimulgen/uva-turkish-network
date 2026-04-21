@@ -123,12 +123,17 @@ export default function EditProfilePage() {
         .from('avatars')
         .upload(path, file, { upsert: true, contentType: file.type });
 
-      if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(path);
-        update('avatar_url', `${publicUrl}?t=${Date.now()}`);
+      if (uploadError) {
+        alert(`Upload failed: ${uploadError.message}`);
+        return;
       }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path);
+      update('avatar_url', `${publicUrl}?t=${Date.now()}`);
+    } catch (err) {
+      alert(`Unexpected error: ${err}`);
     } finally {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
