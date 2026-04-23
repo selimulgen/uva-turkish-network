@@ -15,12 +15,20 @@ declare global {
   var __uvaSupabaseStorageHealed: boolean | undefined;
 }
 
-// Earlier versions of this app accidentally spawned multiple GoTrueClient
-// instances against the same storage key. When they raced on token refresh,
-// localStorage ended up with partially-written / unparseable entries. The
-// browser then hangs on every load waiting to "heal" the orphaned lock.
-// This one-shot scrub drops any `sb-*` entry that isn't valid JSON, so
-// existing users don't have to manually clear site data to recover.
+// In-process async lock that replaces GoTrue's default `navigator.locks` mutex.
+// We observed a real user whose browser had a wedged `navigator.locks` entry
+// for the auth-token key from a prior session — every call to getSession()
+// then hung forever because the lock was never released. Since we already
+// guarantee exactly one client per tab via the globalThis singleton, a
+// per-process queue is enough; we don't need cross-tab coordination.
+const lockQueues = new Map<string, Promise<unknown>>();
+function inMemoryLock<R>(name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> {
+  const prev = lockQueues.get(name) ?? Promise.resolve();
+  const next = prev.then(() => fn(), () => fn());
+  lockQueues.set(name, next.catch(() => {}));
+  return next;
+}
+
 function healCorruptedAuthStorage() {
   if (typeof window === 'undefined') return;
   if (globalThis.__uvaSupabaseStorageHealed) return;
@@ -36,7 +44,7 @@ function healCorruptedAuthStorage() {
       if (raw === null) continue;
       try { JSON.parse(raw); } catch { localStorage.removeItem(key); }
     }
-  } catch { /* localStorage blocked (private mode, quota, etc.) — ignore */ }
+  } catch { /* localStorage blocked — ignore */ }
 }
 
 export function createClient(): SupabaseClient {
@@ -50,7 +58,8 @@ export function createClient(): SupabaseClient {
     healCorruptedAuthStorage();
     globalThis.__uvaSupabaseClient = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { lock: inMemoryLock } }
     );
   }
   return globalThis.__uvaSupabaseClient;
