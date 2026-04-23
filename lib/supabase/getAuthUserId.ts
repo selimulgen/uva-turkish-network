@@ -3,30 +3,40 @@ import { createClient } from './client';
 /**
  * Returns the authenticated user's ID.
  *
- * getSession() reads from local storage/cookies and is instant, but can return
- * null right after the middleware refreshes the token via Set-Cookie headers
- * before the client has synced. Falling back to getUser() makes a single
- * network round-trip to validate and refresh the token when needed — wrapped
- * in a timeout so a hung request can't freeze the page on the loading spinner.
- *
- * If getUser() comes back with an auth error (expired refresh token, revoked
- * session, etc.), we sign out to wipe the corrupted token so subsequent loads
- * don't keep failing the same way — previously users had to manually clear
- * site data to recover.
+ * Recent versions of @supabase/ssr wrap even `getSession()` in the
+ * `navigator.locks` mutex used for token refresh. If the lock is orphaned
+ * (a previous page left it held), `getSession()` blocks for ~5 seconds
+ * before GoTrue forcefully reclaims it. We race every auth call against
+ * a timeout so the UI can't hang on that. If nothing returns in time, we
+ * sign out to wipe whatever corrupted state is holding the lock — this is
+ * what "clear site data" used to do manually, now automated.
  */
+const AUTH_CALL_TIMEOUT_MS = 6000;
+
+function withTimeout<T>(promise: Promise<T>, ms = AUTH_CALL_TIMEOUT_MS): Promise<T | 'timeout'> {
+  return Promise.race([
+    promise,
+    new Promise<'timeout'>(resolve => setTimeout(() => resolve('timeout'), ms)),
+  ]);
+}
+
 export async function getAuthUserId(): Promise<string | null> {
   const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user?.id) return session.user.id;
 
-  const timeout = new Promise<'timeout'>(resolve => setTimeout(() => resolve('timeout'), 8000));
-  const fetchUser = supabase.auth.getUser().then(r => r);
-  const result = await Promise.race([fetchUser, timeout]);
-  if (result === 'timeout') return null;
+  const sessionRes = await withTimeout(supabase.auth.getSession());
+  if (sessionRes !== 'timeout' && sessionRes.data.session?.user?.id) {
+    return sessionRes.data.session.user.id;
+  }
 
-  if (result.error) {
-    await supabase.auth.signOut().catch(() => {});
+  const userRes = await withTimeout(supabase.auth.getUser());
+  if (userRes === 'timeout') {
+    // Lock is wedged — nuke the session so the next load starts clean.
+    await withTimeout(supabase.auth.signOut());
     return null;
   }
-  return result.data.user?.id ?? null;
+  if (userRes.error) {
+    await withTimeout(supabase.auth.signOut());
+    return null;
+  }
+  return userRes.data.user?.id ?? null;
 }
