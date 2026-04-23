@@ -64,8 +64,3 @@ export function createClient(): SupabaseClient {
   }
   return globalThis.__uvaSupabaseClient;
 }
-
-// Expose on window so we can poke at it from DevTools during debugging.
-if (typeof window !== 'undefined') {
-  (window as unknown as { __uvaSupabaseClient?: SupabaseClient }).__uvaSupabaseClient = createClient();
-}

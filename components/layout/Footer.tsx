@@ -24,9 +24,20 @@ export default function Footer() {
             <Link href="/auth/login" className="hover:text-white transition-colors">{t.nav.signIn}</Link>
           </div>
 
-          <p className="text-xs text-white/30">
-            © {new Date().getFullYear()} UVA Turkish Student Association
-          </p>
+          <div className="text-xs text-white/30 text-center md:text-right">
+            <p>© {new Date().getFullYear()} UVA Turkish Student Association</p>
+            <p className="mt-1">
+              Designed and developed by{' '}
+              <a
+                href="https://www.linkedin.com/in/selimulgen"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white/70 transition-colors underline underline-offset-2 decoration-white/20"
+              >
+                Selim Ülgen
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
