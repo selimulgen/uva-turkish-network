@@ -3,16 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
+import { createImplicitClient } from '@/lib/supabase/implicit-client';
 import { useLanguage } from '@/lib/language-context';
 import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
-// Implicit flow client to match the forgot-password page
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  { auth: { flowType: 'implicit' } }
-);
+// Implicit-flow singleton shared with forgot-password.
+const supabase = createImplicitClient();
 
 export default function ResetPasswordPage() {
   const [password, setPassword]               = useState('');

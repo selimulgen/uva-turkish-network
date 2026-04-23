@@ -2,17 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
+import { createImplicitClient } from '@/lib/supabase/implicit-client';
 import { useLanguage } from '@/lib/language-context';
 import { AlertCircle, ArrowLeft, Mail } from 'lucide-react';
 
-// Use implicit flow so the reset link works when opened on a different
-// device or browser (PKCE requires the same browser that made the request).
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  { auth: { flowType: 'implicit' } }
-);
+// Implicit-flow singleton shared with reset-password so the reset link works
+// across browsers/devices, without spawning extra GoTrueClient instances.
+const supabase = createImplicitClient();
 
 export default function ForgotPasswordPage() {
   const [email, setEmail]     = useState('');
