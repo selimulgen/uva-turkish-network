@@ -10,8 +10,22 @@ import { getInitials } from '@/lib/utils';
 import Image from 'next/image';
 import { Menu, X, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 
+const PROFILE_CACHE_KEY = 'navbar_profile_cache';
+
+// Hydrate the navbar's user synchronously from sessionStorage. Without this,
+// every client-side navigation remounts the navbar and it briefly renders
+// the guest version (Opportunities / Sign in / Join) while `getUser()` +
+// the profile query resolve — making the real nav links flash away.
+const readCachedProfile = (): Profile | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(PROFILE_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as Profile) : null;
+  } catch { return null; }
+};
+
 export default function Navbar() {
-  const [user, setUser]               = useState<Profile | null>(null);
+  const [user, setUser]               = useState<Profile | null>(readCachedProfile);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [dropOpen, setDropOpen]       = useState(false);
   const [scrolled, setScrolled]       = useState(false);
@@ -34,20 +48,30 @@ export default function Navbar() {
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
-      if (!authUser) return;
+      if (!authUser) {
+        // Session invalid — clear any stale cached profile so guest nav shows.
+        sessionStorage.removeItem(PROFILE_CACHE_KEY);
+        setUser(null);
+        return;
+      }
       const { data } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
       if (data) {
         setUser(data as Profile);
+        sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(data));
         fetchUnread(authUser.id);
       }
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
+        sessionStorage.removeItem(PROFILE_CACHE_KEY);
         setUser(null);
       } else if (session?.user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-        if (data) setUser(data as Profile);
+        if (data) {
+          setUser(data as Profile);
+          sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(data));
+        }
         fetchUnread(session.user.id);
       }
     });
@@ -74,6 +98,7 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    sessionStorage.removeItem(PROFILE_CACHE_KEY);
     setUser(null);
     setDropOpen(false);
     router.push('/');
