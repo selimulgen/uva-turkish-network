@@ -37,11 +37,22 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
 
   const isProtected = PROTECTED_ROUTES.some(r => path.startsWith(r));
   const isAdminRoute = ADMIN_ROUTES.some(r => path.startsWith(r));
+
+  // If Supabase returned an auth error (expired refresh token, revoked session)
+  // the client still has a stale cookie — sign out on the server so the
+  // Set-Cookie headers clear it. Otherwise every reload hits the same bad token.
+  if (userError && isProtected) {
+    await supabase.auth.signOut().catch(() => {});
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/login';
+    url.searchParams.set('redirectedFrom', path);
+    return NextResponse.redirect(url);
+  }
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
