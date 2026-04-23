@@ -27,7 +27,9 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
+      console.log('[dashboard] fetchData start');
       const userId = await getAuthUserId();
+      console.log('[dashboard] getAuthUserId resolved, userId =', userId);
       if (!userId) { router.replace('/auth/login'); return; }
 
       const queries = Promise.all([
@@ -41,6 +43,7 @@ export default function DashboardPage() {
       ]);
       const timeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 12000));
       const result = await Promise.race([queries, timeout]);
+      console.log('[dashboard] queries resolved, timed out =', result === null);
       if (!result) {
         // One-shot reload guard: if we already retried once this session and still hung, stop — don't loop.
         if (!sessionStorage.getItem('dashboard_reload_attempted')) {
@@ -52,6 +55,7 @@ export default function DashboardPage() {
       sessionStorage.removeItem('dashboard_reload_attempted');
 
       const [profileRes, jobsRes, reqRes] = result;
+      console.log('[dashboard] profileRes.data =', !!profileRes.data, 'jobs =', jobsRes.data?.length, 'reqs =', reqRes.data?.length);
       // User is authenticated (userId exists) but profile row missing — send to edit, not login.
       if (!profileRes.data) { router.replace('/profile/edit'); return; }
       const p = profileRes.data as Profile;
