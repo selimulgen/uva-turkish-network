@@ -31,14 +31,25 @@ export default function JobsPage() {
       const authRes = await supabase.auth.getSession();
       const user    = authRes.data.session?.user ?? null;
 
-      const [jobsRes, profileRes] = await Promise.all([
+      const queries = Promise.all([
         supabase.from('jobs')
           .select('*, profiles(id, full_name, email, linkedin_url, show_contact_info)')
           .eq('is_active', true)
           .order('created_at', { ascending: false }),
         user ? supabase.from('profiles').select('*').eq('id', user.id).single() : Promise.resolve({ data: null }),
       ]);
+      const timeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 12000));
+      const result = await Promise.race([queries, timeout]);
+      if (!result) {
+        if (!sessionStorage.getItem('jobs_reload_attempted')) {
+          sessionStorage.setItem('jobs_reload_attempted', '1');
+          window.location.reload();
+        }
+        return;
+      }
+      sessionStorage.removeItem('jobs_reload_attempted');
 
+      const [jobsRes, profileRes] = result;
       setJobs((jobsRes.data as unknown as Job[]) || []);
       if (profileRes.data) setCurrentUser(profileRes.data as Profile);
     } finally {

@@ -28,9 +28,9 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     try {
       const userId = await getAuthUserId();
-      if (!userId) { router.push('/auth/login'); return; }
+      if (!userId) { router.replace('/auth/login'); return; }
 
-      const [profileRes, jobsRes, reqRes] = await Promise.all([
+      const queries = Promise.all([
         supabase.from('profiles').select('*').eq('id', userId).single(),
         supabase.from('jobs').select('*, profiles(full_name)').eq('is_active', true)
           .order('created_at', { ascending: false }).limit(3),
@@ -39,11 +39,24 @@ export default function DashboardPage() {
           .or(`from_user.eq.${userId},to_user.eq.${userId}`)
           .order('created_at', { ascending: false }).limit(5),
       ]);
+      const timeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 12000));
+      const result = await Promise.race([queries, timeout]);
+      if (!result) {
+        // One-shot reload guard: if we already retried once this session and still hung, stop — don't loop.
+        if (!sessionStorage.getItem('dashboard_reload_attempted')) {
+          sessionStorage.setItem('dashboard_reload_attempted', '1');
+          window.location.reload();
+        }
+        return;
+      }
+      sessionStorage.removeItem('dashboard_reload_attempted');
 
-      if (!profileRes.data) { router.push('/auth/login'); return; }
+      const [profileRes, jobsRes, reqRes] = result;
+      // User is authenticated (userId exists) but profile row missing — send to edit, not login.
+      if (!profileRes.data) { router.replace('/profile/edit'); return; }
       const p = profileRes.data as Profile;
       setProfile(p);
-      if (!p.profile_completed) { router.push('/profile/edit'); return; }
+      if (!p.profile_completed) { router.replace('/profile/edit'); return; }
       setRecentJobs((jobsRes.data as unknown as Job[]) || []);
       setRequests((reqRes.data as unknown as NetworkRequest[]) || []);
     } finally {
@@ -60,7 +73,10 @@ export default function DashboardPage() {
     return <Clock size={14} className="text-amber-500" />;
   };
 
-  if (loading) return (
+  // Keep the spinner up until we have a profile — otherwise a single render
+  // frame with `loading=false` + `profile=null` briefly shows "U" initials
+  // and an empty greeting while a redirect is in flight.
+  if (loading || !profile) return (
     <div className="min-h-screen bg-[#F4EFE6]">
       <Navbar />
       <div className="flex items-center justify-center h-screen">
